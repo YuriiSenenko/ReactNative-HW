@@ -92,7 +92,7 @@ const ProfileScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
           <View>
-            <Text style={{ ...globalStyle.title, ...styles.title }}>Name</Text>
+            <Text style={[globalStyle.title, styles.title]}>Name</Text>
           </View>
 
           <FlatList

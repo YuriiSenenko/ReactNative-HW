@@ -5,7 +5,7 @@ import { globalStyle } from "../styles/globalStyle";
 export default function NotActiveSubmitBTN({ children, submit }) {
   return (
     <TouchableOpacity
-      style={{ ...globalStyle.btn, ...styles.btn }}
+      style={[globalStyle.btn, styles.btn]}
       activeOpacity={0.7}
       onPress={submit}
     >
