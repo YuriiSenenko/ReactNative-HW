@@ -1,5 +1,5 @@
 import React from "react";
-import DefaultScreenPosts from "../nestedScreens/PostsScreen";
+import PostsScreen from "../nestedScreens/PostsScreen";
 import CommentsScreen from "../nestedScreens/CommentsScreen";
 import MapScreen from "../nestedScreens/MapScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -26,7 +26,7 @@ const Home = () => {
       <NestedScreen.Screen
         // options={{ headerShown: false }}
         name="Публікації"
-        component={DefaultScreenPosts}
+        component={PostsScreen}
         options={{
           headerRight: () => (
             <Feather

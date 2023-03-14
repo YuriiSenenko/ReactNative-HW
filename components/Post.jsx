@@ -47,7 +47,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 8,
     fontSize: 16,
-    fontWeight: 500,
   },
   fotoDescription: {
     flexDirection: "row",
