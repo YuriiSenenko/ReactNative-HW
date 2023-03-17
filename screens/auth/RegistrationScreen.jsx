@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import ActiveSubmitBtn from "../../components/ActiveSubmitBtn";
+import * as ImagePicker from "expo-image-picker";
 import {
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
@@ -15,10 +15,20 @@ import {
   Keyboard,
   Dimensions,
 } from "react-native";
+import { SubmitBtn } from "../../components/SubmitBtn";
 import { globalStyle } from "../../styles/globalStyle";
+import { colors } from "../../styles/colors";
+const {
+  backgroundColor,
+  acentColor,
+  imputBackgroundColor,
+  borderColor,
+  placeholderColor,
+  linkColor,
+} = colors;
 
 // import icons
-import { Feather } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 
 const initialState = {
   avatar: "",
@@ -28,23 +38,41 @@ const initialState = {
 };
 
 export default function RegistrationScreen({ navigation }) {
-  const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [state, setState] = useState(initialState);
+  const [image, setImage] = useState(null);
+  const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [dimensions, setDimensions] = useState(Dimensions.get("window").width);
   const [passwordIsHide, setPasswordIsHide] = useState(true);
   const [inputLoginActive, setInputLoginActive] = useState(false);
   const [inputEmailActive, setInputEmailActive] = useState(false);
   const [inputPasswordActive, setInputPasswordActive] = useState(false);
 
-  // useEffect(() => {}, [isShowKeyboard]);
+  const getImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+      setState((prevstate) => ({ ...prevstate, avatar: result.assets[0].uri }));
+    }
+  };
+
+  const deleteAvatar = () => {
+    setImage(null);
+  };
 
   const keboardHide = () => {
+    console.log(state);
+
     setIsShowKeyboard(false);
     Keyboard.dismiss();
     setState(initialState);
+    setImage(null);
     setPasswordIsHide(true);
-    navigation.navigate("Дом");
-    console.log(state);
   };
 
   const touchableWithout = () => {
@@ -72,17 +100,32 @@ export default function RegistrationScreen({ navigation }) {
                   left: dimensions / 2 - 60,
                 }}
               >
-                {/* <Image
-                  style={styles.avatarImage}
-                  source={require("../assets/images/avatar_img.jpg")}
-                /> */}
-                <TouchableOpacity
-                  style={styles.addIcon}
-                  activeOpacity={0.6}
-                  onPress={() => navigation.navigate("Login")}
-                >
-                  <Feather name="plus-circle" size={24} color="#FF6C00" />
-                </TouchableOpacity>
+                <Image style={styles.avatarImage} source={{ uri: image }} />
+                {!image ? (
+                  <TouchableOpacity
+                    style={styles.addIcon}
+                    activeOpacity={0.6}
+                    onPress={getImage}
+                  >
+                    <AntDesign
+                      name="pluscircleo"
+                      size={24}
+                      color={acentColor}
+                    />
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.addIcon}
+                    activeOpacity={0.6}
+                    onPress={deleteAvatar}
+                  >
+                    <AntDesign
+                      name="closecircleo"
+                      size={24}
+                      color={placeholderColor}
+                    />
+                  </TouchableOpacity>
+                )}
               </View>
               <Text style={{ ...globalStyle.title, ...styles.title }}>
                 Реєстрація
@@ -90,13 +133,15 @@ export default function RegistrationScreen({ navigation }) {
               <TextInput
                 style={{
                   ...globalStyle.input,
-                  backgroundColor: inputLoginActive ? "#fff" : "#F6F6F6",
-                  borderColor: inputLoginActive ? "#FF6C00" : "#E8E8E8",
+                  backgroundColor: inputLoginActive
+                    ? backgroundColor
+                    : imputBackgroundColor,
+                  borderColor: inputLoginActive ? acentColor : borderColor,
                 }}
                 inputMode={"text"}
                 placeholder={"Логін"}
-                placeholderTextColor={"#BDBDBD"}
-                cursorColor={"#FF6C00"}
+                placeholderTextColor={placeholderColor}
+                cursorColor={acentColor}
                 value={state.login}
                 onFocus={() => {
                   setInputLoginActive(true);
@@ -116,13 +161,15 @@ export default function RegistrationScreen({ navigation }) {
                 style={{
                   ...globalStyle.input,
                   marginTop: 16,
-                  backgroundColor: inputEmailActive ? "#fff" : "#F6F6F6",
-                  borderColor: inputEmailActive ? "#FF6C00" : "#E8E8E8",
+                  backgroundColor: inputEmailActive
+                    ? backgroundColor
+                    : imputBackgroundColor,
+                  borderColor: inputEmailActive ? acentColor : borderColor,
                 }}
                 inputMode={"email"}
                 placeholder={"Адреса електронної пошти"}
-                placeholderTextColor={"#BDBDBD"}
-                cursorColor={"#FF6C00"}
+                placeholderTextColor={placeholderColor}
+                cursorColor={acentColor}
                 value={state.email}
                 onFocus={() => {
                   setInputEmailActive(true);
@@ -143,13 +190,15 @@ export default function RegistrationScreen({ navigation }) {
                   style={{
                     ...globalStyle.input,
                     marginTop: 16,
-                    backgroundColor: inputPasswordActive ? "#fff" : "#F6F6F6",
-                    borderColor: inputPasswordActive ? "#FF6C00" : "#E8E8E8",
+                    backgroundColor: inputPasswordActive
+                      ? backgroundColor
+                      : imputBackgroundColor,
+                    borderColor: inputPasswordActive ? acentColor : borderColor,
                   }}
                   inputMode={"text"}
                   placeholder={"Пароль"}
-                  placeholderTextColor={"#BDBDBD"}
-                  cursorColor={"#FF6C00"}
+                  placeholderTextColor={placeholderColor}
+                  cursorColor={acentColor}
                   value={state.password}
                   secureTextEntry={passwordIsHide}
                   onFocus={() => {
@@ -160,7 +209,10 @@ export default function RegistrationScreen({ navigation }) {
                     setInputPasswordActive(false);
                   }}
                   onChangeText={(value) =>
-                    setState((prevstate) => ({ ...prevstate, password: value }))
+                    setState((prevstate) => ({
+                      ...prevstate,
+                      password: value,
+                    }))
                   }
                   onSubmitEditing={() => {
                     keboardHide();
@@ -175,25 +227,28 @@ export default function RegistrationScreen({ navigation }) {
                       : setPasswordIsHide(true)
                   }
                 >
-                  <Text style={{ fontSize: 16, color: "#1B4371" }}>
+                  <Text style={{ fontSize: 16, color: linkColor }}>
                     {passwordIsHide ? "Показати" : "Приховати"}
                   </Text>
                 </TouchableOpacity>
               </View>
-              <ActiveSubmitBtn submit={keboardHide}>
-                Зареєструватися
-              </ActiveSubmitBtn>
+              <SubmitBtn
+                submit={keboardHide}
+                bgColor={acentColor}
+                titleColor={backgroundColor}
+                title="Зареєструватися"
+              />
               <TouchableOpacity
                 style={styles.goLogin}
                 activeOpacity={0.6}
                 onPress={() => navigation.navigate("Login")}
               >
-                <Text style={styles.goLoginTitle}>Уже є аккаунт? Війти</Text>
+                <Text style={styles.goLoginTitle}>Уже є аккаунт? Ввійти</Text>
               </TouchableOpacity>
             </View>
           </KeyboardAvoidingView>
         </ImageBackground>
-        {/* <StatusBar style="auto" /> */}
+        <StatusBar style="auto" />
       </View>
     </TouchableWithoutFeedback>
   );
@@ -202,7 +257,7 @@ export default function RegistrationScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: backgroundColor,
     justifyContent: "center",
   },
   backgroundImg: {
@@ -211,7 +266,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   form: {
-    backgroundColor: "#FEFEFE",
+    backgroundColor: backgroundColor,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     paddingLeft: 16,
@@ -221,7 +276,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -60,
     borderRadius: 16,
-    backgroundColor: "#F6F6F6",
+    backgroundColor: imputBackgroundColor,
     width: 120,
     height: 120,
   },
@@ -234,20 +289,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 80,
     right: -12,
-    backgroundColor: "#fff",
+    backgroundColor: backgroundColor,
     borderRadius: 50,
   },
   title: {
     marginTop: 92,
   },
-  // input: {
-  //   paddingLeft: 16,
-  //   paddingRight: 16,
-  //   borderRadius: 8,
-  //   height: 50,
-  //   borderWidth: 1,
-  //   color: "#212121",
-  // },
+
   showPasswordBtn: {
     position: "absolute",
     top: 28,
@@ -262,6 +310,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "400",
     textAlign: "center",
-    color: "#1B4371",
+    color: linkColor,
   },
 });

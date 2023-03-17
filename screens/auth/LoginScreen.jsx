@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import ActiveSubmitBtn from "../../components/ActiveSubmitBtn";
+import React, { useState } from "react";
+import { SubmitBtn } from "../../components/SubmitBtn";
 import { StatusBar } from "expo-status-bar";
 import {
   TouchableWithoutFeedback,
@@ -14,6 +14,15 @@ import {
   Keyboard,
 } from "react-native";
 import { globalStyle } from "../../styles/globalStyle";
+import { colors } from "../../styles/colors";
+const {
+  backgroundColor,
+  acentColor,
+  imputBackgroundColor,
+  borderColor,
+  placeholderColor,
+  linkColor,
+} = colors;
 
 const initialState = {
   email: "",
@@ -21,28 +30,18 @@ const initialState = {
 };
 
 export default function LoginScreen({ navigation }) {
-  const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [state, setState] = useState(initialState);
+  const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [passwordIsHide, setPasswordIsHide] = useState(true);
-  const [inputLoginActive, setInputLoginActive] = useState(false);
   const [inputEmailActive, setInputEmailActive] = useState(false);
   const [inputPasswordActive, setInputPasswordActive] = useState(false);
-  // const [dimensions, setDimensions] = useState(Dimensions.get("window").width);
-
-  // useEffect(() => {
-  //   const onChange = () => {
-  //     const width = Dimensions.get("window").width;
-  //     console.log(width);
-  //   };
-  //   Dimensions.addEventListener("change", onChange);
-  // }, []);
 
   const keboardHide = () => {
     setIsShowKeyboard(false);
     Keyboard.dismiss();
     setState(initialState);
     setPasswordIsHide(true);
-    navigation.navigate("Дом");
+
     console.log(state);
   };
 
@@ -72,19 +71,21 @@ export default function LoginScreen({ navigation }) {
               <TextInput
                 style={{
                   ...globalStyle.input,
-                  backgroundColor: inputLoginActive ? "#fff" : "#F6F6F6",
-                  borderColor: inputLoginActive ? "#FF6C00" : "#E8E8E8",
+                  backgroundColor: inputEmailActive
+                    ? backgroundColor
+                    : imputBackgroundColor,
+                  borderColor: inputEmailActive ? acentColor : borderColor,
                 }}
                 placeholder={"Адреса електронної пошти"}
-                placeholderTextColor={"#BDBDBD"}
-                cursorColor={"#FF6C00"}
+                placeholderTextColor={placeholderColor}
+                cursorColor={acentColor}
                 value={state.email}
                 onFocus={() => {
-                  setInputLoginActive(true);
+                  setInputEmailActive(true);
                   setIsShowKeyboard(true);
                 }}
                 onBlur={() => {
-                  setInputLoginActive(false);
+                  setInputEmailActive(false);
                 }}
                 onChangeText={(value) =>
                   setState((prevstate) => ({ ...prevstate, email: value }))
@@ -98,20 +99,22 @@ export default function LoginScreen({ navigation }) {
                   style={{
                     ...globalStyle.input,
                     marginTop: 16,
-                    backgroundColor: inputEmailActive ? "#fff" : "#F6F6F6",
-                    borderColor: inputEmailActive ? "#FF6C00" : "#E8E8E8",
+                    backgroundColor: inputPasswordActive
+                      ? backgroundColor
+                      : imputBackgroundColor,
+                    borderColor: inputPasswordActive ? acentColor : borderColor,
                   }}
                   placeholder={"Пароль"}
-                  placeholderTextColor={"#BDBDBD"}
-                  cursorColor={"#FF6C00"}
+                  placeholderTextColor={placeholderColor}
+                  cursorColor={acentColor}
                   value={state.password}
                   secureTextEntry={passwordIsHide}
                   onFocus={() => {
-                    setInputEmailActive(true);
+                    setInputPasswordActive(true);
                     setIsShowKeyboard(true);
                   }}
                   onBlur={() => {
-                    setInputEmailActive(false);
+                    setInputPasswordActive(false);
                   }}
                   onChangeText={(value) =>
                     setState((prevstate) => ({ ...prevstate, password: value }))
@@ -129,12 +132,17 @@ export default function LoginScreen({ navigation }) {
                       : setPasswordIsHide(true)
                   }
                 >
-                  <Text style={{ fontSize: 16, color: "#1B4371" }}>
+                  <Text style={{ fontSize: 16, color: linkColor }}>
                     {passwordIsHide ? "Показати" : "Приховати"}
                   </Text>
                 </TouchableOpacity>
               </View>
-              <ActiveSubmitBtn submit={keboardHide}>Війти</ActiveSubmitBtn>
+              <SubmitBtn
+                submit={keboardHide}
+                bgColor={acentColor}
+                titleColor={backgroundColor}
+                title="Ввійти"
+              />
 
               <TouchableOpacity
                 style={{ marginTop: 16, marginBottom: 144 }}
@@ -157,16 +165,17 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    justifyContent: "center",
+    backgroundColor: backgroundColor,
+    // justifyContent: "center",
   },
   backgroundImg: {
     flex: 1,
     resizeMode: "cover",
     justifyContent: "flex-end",
+    // alignItems: "center",
   },
   form: {
-    backgroundColor: "#FEFEFE",
+    backgroundColor: backgroundColor,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     paddingLeft: 16,
@@ -176,14 +185,7 @@ const styles = StyleSheet.create({
   title: {
     marginTop: 32,
   },
-  // input: {
-  //   paddingLeft: 16,
-  //   paddingRight: 16,
-  //   borderRadius: 8,
-  //   height: 50,
-  //   borderWidth: 1,
-  //   color: "#212121",
-  // },
+
   showPasswordBtn: {
     position: "absolute",
     top: 28,
@@ -195,6 +197,6 @@ const styles = StyleSheet.create({
 
     fontWeight: "400",
     textAlign: "center",
-    color: "#1B4371",
+    color: linkColor,
   },
 });

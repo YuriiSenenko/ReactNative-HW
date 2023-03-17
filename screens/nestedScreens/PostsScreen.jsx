@@ -13,6 +13,8 @@ import {
   ScrollView,
 } from "react-native";
 import Post from "../../components/Post";
+import { colors } from "../../styles/colors";
+const { backgroundColor, acentColor } = colors;
 
 const initialState = {
   photo: "https://loremflickr.com/640/480/city",
@@ -66,7 +68,7 @@ export default function PostsScreen({ navigation, route }) {
   if (isLoading) {
     return (
       <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#FF6C00" />
+        <ActivityIndicator size="large" color={acentColor} />
         <Text style={styles.loaderTitle}>Завантаження...</Text>
       </View>
     );
@@ -114,7 +116,7 @@ const styles = StyleSheet.create({
     flex: 1,
     // justifyContent: "center",
     // alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: backgroundColor,
   },
   loader: {
     flex: 1,

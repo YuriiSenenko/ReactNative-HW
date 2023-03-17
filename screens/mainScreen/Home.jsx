@@ -3,6 +3,8 @@ import PostsScreen from "../nestedScreens/PostsScreen";
 import CommentsScreen from "../nestedScreens/CommentsScreen";
 import MapScreen from "../nestedScreens/MapScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { colors } from "../../styles/colors";
+const { textColor, placeholderColor, goBackIconColor } = colors;
 
 // import icons
 import { Feather } from "@expo/vector-icons";
@@ -18,7 +20,7 @@ const Home = () => {
         headerTitleStyle: {
           fontFamily: "Roboto-500",
           fontSize: 17,
-          color: "#212121",
+          color: textColor,
         },
         tabBarShowLabel: false,
       }}
@@ -33,42 +35,36 @@ const Home = () => {
               onPress={() => alert("This is a button!")}
               name="log-out"
               size={24}
-              color="#BDBDBD"
+              color={placeholderColor}
             />
           ),
           headerShadowVisible: true,
         }}
       />
-      <NestedScreen.Screen
-        // options={{ headerShown: false }}
-        name="Коментарі"
-        component={CommentsScreen}
-        options={({ navigation }) => ({
+      <NestedScreen.Group
+        screenOptions={({ navigation }) => ({
+          presentation: "modal",
           headerLeft: () => (
             <AntDesign
               onPress={() => navigation.goBack()}
               name="arrowleft"
               size={24}
-              color="rgba(33, 33, 33, 0.8)"
+              color={goBackIconColor}
             />
           ),
         })}
-      />
-      <NestedScreen.Screen
-        // options={{ headerShown: false }}
-        name="Карта"
-        component={MapScreen}
-        options={({ navigation }) => ({
-          headerLeft: () => (
-            <AntDesign
-              onPress={() => navigation.goBack()}
-              name="arrowleft"
-              size={24}
-              color="rgba(33, 33, 33, 0.8)"
-            />
-          ),
-        })}
-      />
+      >
+        <NestedScreen.Screen
+          // options={{ headerShown: false }}
+          name="Коментарі"
+          component={CommentsScreen}
+        />
+        <NestedScreen.Screen
+          // options={{ headerShown: false }}
+          name="Карта"
+          component={MapScreen}
+        />
+      </NestedScreen.Group>
     </NestedScreen.Navigator>
   );
 };

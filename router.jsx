@@ -14,6 +14,8 @@ import LoginScreen from "./screens/auth/LoginScreen.jsx";
 import Home from "./screens/mainScreen/Home";
 import CreatePostScreen from "./screens/mainScreen/CreatePostScreen";
 import ProfileScreen from "./screens/mainScreen/ProfileScreen";
+import { colors } from "./styles/colors";
+const { iconCameraColor, acentColor, textColor, goBackIconColor } = colors;
 
 const AuthStack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -37,12 +39,13 @@ const useRoute = (isAuth) => {
   }
   return (
     <Tab.Navigator
+      initialRouteName="Публікації"
       screenOptions={{
         headerTitleAlign: "center",
         headerTitleStyle: {
           fontFamily: "Roboto-500",
           fontSize: 17,
-          color: "#212121",
+          color: textColor,
         },
         tabBarShowLabel: false,
       }}
@@ -52,11 +55,7 @@ const useRoute = (isAuth) => {
           headerShown: false,
           tabBarIcon: ({ focused, color, size }) => (
             <View style={{ ...styles.iconsContainer, marginLeft: 81 }}>
-              <Ionicons
-                name="grid-outline"
-                size={24}
-                color="rgba(33, 33, 33, 0.8)"
-              />
+              <Ionicons name="grid-outline" size={24} color={goBackIconColor} />
             </View>
           ),
         }}
@@ -67,7 +66,7 @@ const useRoute = (isAuth) => {
         options={({ navigation }) => ({
           tabBarIcon: ({ focused, color, size }) => (
             <View style={styles.buttonCreate}>
-              <Feather name="plus" size={13} color="#fff" />
+              <Feather name="plus" size={13} color={iconCameraColor} />
             </View>
           ),
           headerLeft: () => (
@@ -78,9 +77,10 @@ const useRoute = (isAuth) => {
               }}
               name="arrowleft"
               size={24}
-              color="rgba(33, 33, 33, 0.8)"
+              color={goBackIconColor}
             />
           ),
+          tabBarStyle: { display: "none" },
         })}
         name="Створити публікацію"
         component={CreatePostScreen}
@@ -90,7 +90,7 @@ const useRoute = (isAuth) => {
           headerShown: false,
           tabBarIcon: ({ focused, color, size }) => (
             <View style={{ ...styles.iconsContainer, marginRight: 81 }}>
-              <Feather name="user" size={24} color="rgba(33, 33, 33, 0.8)" />
+              <Feather name="user" size={24} color={goBackIconColor} />
             </View>
           ),
         }}
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: 70,
     height: 40,
-    backgroundColor: "#FF6C00",
+    backgroundColor: acentColor,
     borderRadius: 20,
   },
 });

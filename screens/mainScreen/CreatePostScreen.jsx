@@ -11,11 +11,20 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   ScrollView,
+  Alert,
 } from "react-native";
+import { colors } from "../../styles/colors";
+const {
+  backgroundColor,
+  acentColor,
+  imputBackgroundColor,
+  borderColor,
+  textColor,
+  placeholderColor,
+} = colors;
 
-// import SubmitBtn from "../elements/ActiveSubmitBtn";
-import NotActiveSubmitBTN from "../../components/NotActiveSubmitBTN";
-import ActiveSubmitBtn from "../../components/ActiveSubmitBtn";
+// import NotActiveSubmitBTN from "../../components/NotActiveSubmitBTN";
+import { SubmitBtn } from "../../components/SubmitBtn";
 import PhotoCamera from "../../components/PhotoCamera";
 
 //import icons
@@ -78,6 +87,8 @@ export const CreatePostScreen = ({ navigation }) => {
     }));
   };
 
+  const alert = () => Alert.alert("Зробіть фото");
+
   const submit = async () => {
     // const currentlocation = await Location.getCurrentPositionAsync();
     // setLocation(currentlocation);
@@ -136,8 +147,8 @@ export const CreatePostScreen = ({ navigation }) => {
               style={styles.input}
               inputMode={"text"}
               placeholder={"Назва..."}
-              placeholderTextColor={"#BDBDBD"}
-              cursorColor={"#FF6C00"}
+              placeholderTextColor={placeholderColor}
+              cursorColor={acentColor}
               value={state.name}
               onFocus={() => {
                 setIsShowKeyboard(true);
@@ -151,14 +162,14 @@ export const CreatePostScreen = ({ navigation }) => {
                 style={styles.locationIcon}
                 name="location-pin"
                 size={24}
-                color="#BDBDBD"
+                color={placeholderColor}
               />
               <TextInput
                 style={{ ...styles.input, marginTop: 16, paddingLeft: 28 }}
                 inputMode={"text"}
                 placeholder={"Локація..."}
-                placeholderTextColor={"#BDBDBD"}
-                cursorColor={"#FF6C00"}
+                placeholderTextColor={placeholderColor}
+                cursorColor={acentColor}
                 value={state.location}
                 onFocus={() => {
                   setIsShowKeyboard(true);
@@ -168,9 +179,21 @@ export const CreatePostScreen = ({ navigation }) => {
                 }
               ></TextInput>
             </View>
-            <NotActiveSubmitBTN submit={submit}>
-              Опублікувати
-            </NotActiveSubmitBTN>
+            {!photo ? (
+              <SubmitBtn
+                submit={alert}
+                bgColor={imputBackgroundColor}
+                titleColor={placeholderColor}
+                title="Опублікувати"
+              />
+            ) : (
+              <SubmitBtn
+                submit={submit}
+                bgColor={acentColor}
+                titleColor={backgroundColor}
+                title="Опублікувати"
+              />
+            )}
           </View>
           <View style={styles.buttonDeleteContainer}>
             <TouchableOpacity
@@ -178,7 +201,7 @@ export const CreatePostScreen = ({ navigation }) => {
               style={styles.buttonDelete}
               onPress={clearForm}
             >
-              <AntDesign name="delete" size={24} color="#BDBDBD" />
+              <AntDesign name="delete" size={24} color={placeholderColor} />
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -190,12 +213,11 @@ export const CreatePostScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    // justifyContent: "center",
-    // alignItems: "center",
+    backgroundColor: backgroundColor,
   },
   form: {
     marginTop: 32,
+
     marginHorizontal: 16,
   },
   photoContainer: {
@@ -203,37 +225,23 @@ const styles = StyleSheet.create({
   },
   preView: {
     height: 240,
-    backgroundColor: "#F6F6F6",
-    borderColor: "#E8E8E8",
+    backgroundColor: imputBackgroundColor,
+    borderColor: borderColor,
     borderWidth: 1,
     borderRadius: 8,
     marginBottom: 8,
-    justifyContent: "center",
-    alignItems: "center",
+    // justifyContent: "center",
+    // alignItems: "center",
   },
 
-  cameraIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 50,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  photo: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-    borderRadius: 8,
-  },
   photoText: {
-    color: "#BDBDBD",
+    color: placeholderColor,
   },
   input: {
     height: 50,
     borderBottomWidth: 1,
-    borderColor: "#E8E8E8",
-    color: "#212121",
+    borderColor: borderColor,
+    color: textColor,
     fontSize: 16,
   },
   locationIcon: {
@@ -241,16 +249,17 @@ const styles = StyleSheet.create({
     top: 27,
   },
   buttonDeleteContainer: {
-    justifyContent: "center",
+    // marginTop: 30,
     alignItems: "center",
+    // marginBottom: 34,
   },
   buttonDelete: {
-    marginBottom: 34,
+    // marginTop: 30,
     justifyContent: "center",
     alignItems: "center",
     width: 70,
     height: 40,
-    backgroundColor: "#F6F6F6",
+    backgroundColor: imputBackgroundColor,
     borderRadius: 20,
   },
 });

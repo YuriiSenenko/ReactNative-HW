@@ -8,7 +8,10 @@ import {
   View,
   Image,
 } from "react-native";
+import { colors } from "../styles/colors";
+const { iconCameraColor, iconCameraBGColor } = colors;
 
+//import icons
 import { Fontisto } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 
@@ -50,36 +53,37 @@ export default function PhotoCamera({ newPhoto, camera }) {
     <View style={styles.container}>
       <Camera style={styles.camera} type={type} ref={camera}>
         <TouchableOpacity style={styles.cameraIcon} onPress={newPhoto}>
-          <Fontisto name="camera" size={24} color="#fff" />
+          <Fontisto name="camera" size={24} color={iconCameraColor} />
         </TouchableOpacity>
       </Camera>
+
       <TouchableOpacity
         style={styles.toggleCameraType}
         onPress={toggleCameraType}
       >
-        <FontAwesome name="refresh" size={20} color="#fff" />
+        <FontAwesome name="refresh" size={20} color={iconCameraColor} />
       </TouchableOpacity>
     </View>
   );
 }
 const styles = StyleSheet.create({
   container: {
-    width: " 100%",
-    height: "100%",
-    // flex: 1,
-    // borderRadius: 8,
+    flex: 1,
+
+    borderRadius: 8,
+    overflow: "hidden",
   },
+
   camera: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 8,
   },
   cameraIcon: {
     width: 60,
     height: 60,
     borderRadius: 50,
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    backgroundColor: iconCameraBGColor,
     justifyContent: "center",
     alignItems: "center",
   },

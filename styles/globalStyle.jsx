@@ -1,11 +1,13 @@
 import { StyleSheet } from "react-native";
+import { colors } from "./colors";
+const { textColor, placeholderColor, imputBackgroundColor } = colors;
 
-export const globalStyle = StyleSheet.create({
+const globalStyle = StyleSheet.create({
   title: {
     marginBottom: 32,
     fontSize: 30,
     textAlign: "center",
-    color: "#212121",
+    color: textColor,
     fontFamily: "Roboto-500",
   },
   input: {
@@ -14,13 +16,32 @@ export const globalStyle = StyleSheet.create({
     borderRadius: 8,
     height: 50,
     borderWidth: 1,
-    color: "#212121",
-  },
-  btn: {
-    height: 51,
-    borderRadius: 100,
-    marginTop: 43,
-    justifyContent: "center",
-    alignItems: "center",
+    color: textColor,
   },
 });
+
+const commentsGlobalStyle = StyleSheet.create({
+  commentSection: { marginHorizontal: 16, marginBottom: 24 },
+  commentView: {
+    flex: 1,
+    padding: 16,
+    borderBottomRightRadius: 6,
+    borderBottomLeftRadius: 6,
+    backgroundColor: imputBackgroundColor,
+  },
+  commentText: {
+    fontFamily: "Roboto-400",
+    fontSize: 13,
+    lineHeight: 18,
+    color: textColor,
+  },
+  commentDate: {
+    fontFamily: "Roboto-400",
+    fontSize: 10,
+    lineHeight: 11.72,
+    color: placeholderColor,
+    marginTop: 8,
+  },
+});
+
+export { globalStyle, commentsGlobalStyle };

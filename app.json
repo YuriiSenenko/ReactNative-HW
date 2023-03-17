@@ -12,6 +12,14 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Додаток отримає доступ до ваших фотографій."
+        }
+      ]
+    ],
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "jsEngine": "jsc",

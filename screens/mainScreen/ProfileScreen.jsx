@@ -10,8 +10,12 @@ import {
   FlatList,
   ActivityIndicator,
   ScrollView,
+  SafeAreaView,
+  SectionList,
 } from "react-native";
 import { globalStyle } from "../../styles/globalStyle";
+import { colors } from "../../styles/colors";
+const { backgroundColor, acentColor, borderColor, placeholderColor } = colors;
 
 import Post from "../../components/Post";
 
@@ -52,78 +56,79 @@ const ProfileScreen = ({ navigation }) => {
   if (isLoading) {
     return (
       <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#FF6C00" />
+        <ActivityIndicator size="large" color={acentColor} />
         <Text style={styles.loaderTitle}>Завантаження...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <ImageBackground
         source={require("../../assets/images/sea.jpg")}
         style={styles.backgroundImg}
       >
-        <View style={styles.profile}>
-          <Feather
-            style={styles.logoutIcon}
-            name="log-out"
-            size={24}
-            color="#BDBDBD"
-          />
-          <View
-            style={{
-              ...styles.avatarView,
-              left: dimensions / 2 - 60,
-            }}
-          >
-            <Image
-              style={styles.avatarImage}
-              source={require("../../assets/images/avatar_img.jpg")}
+        <View>
+          <View style={styles.profile}>
+            <Feather
+              style={styles.logoutIcon}
+              name="log-out"
+              size={24}
+              color={placeholderColor}
             />
-            <TouchableOpacity
-              style={styles.addIcon}
-              activeOpacity={0.6}
-              onPress={() => {
-                navigation.navigate("Login");
+            <View
+              style={{
+                ...styles.avatarView,
+                left: dimensions / 2 - 60,
               }}
             >
-              <Feather name="x-circle" size={25} color="#E8E8E8" />
-            </TouchableOpacity>
-          </View>
-          <View>
-            <Text style={[globalStyle.title, styles.title]}>Name</Text>
-          </View>
-
-          <FlatList
-            data={posts}
-            renderItem={({ item }) => (
+              <Image
+                style={styles.avatarImage}
+                source={require("../../assets/images/avatar_img.jpg")}
+              />
               <TouchableOpacity
-                activeOpacity={0.7}
-                onPress={() => navigation.navigate("Коментарі", { item })}
+                style={styles.addIcon}
+                activeOpacity={0.6}
+                onPress={() => {
+                  navigation.navigate("Login");
+                }}
               >
-                <Post
-                  photo={item.photo}
-                  decription={item.decription}
-                  comments={item.comments}
-                  likes={item.likes}
-                  location={item.location}
-                />
+                <Feather name="x-circle" size={25} color={borderColor} />
               </TouchableOpacity>
-            )}
-          />
+            </View>
+            <View>
+              <Text style={[globalStyle.title, styles.title]}>Name</Text>
+            </View>
+            <View>
+              <FlatList
+                data={posts}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => navigation.navigate("Коментарі", { item })}
+                  >
+                    <Post
+                      photo={item.photo}
+                      decription={item.decription}
+                      comments={item.comments}
+                      likes={item.likes}
+                      location={item.location}
+                    />
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          </View>
         </View>
       </ImageBackground>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
-    backgroundColor: "#FEFEFE",
+    backgroundColor: backgroundColor,
   },
   backgroundImg: {
     flex: 1,
@@ -141,14 +146,13 @@ const styles = StyleSheet.create({
   },
   profile: {
     marginTop: 147,
-    backgroundColor: "#FEFEFE",
+    backgroundColor: backgroundColor,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
   },
   avatarView: {
     position: "absolute",
     top: -60,
-    // borderRadius: 16,
     width: 120,
     height: 120,
   },
@@ -161,8 +165,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 80,
     right: -12,
-    // backgroundColor: "#fff",
-    // borderRadius: 50,
   },
   logoutIcon: {
     position: "absolute",
