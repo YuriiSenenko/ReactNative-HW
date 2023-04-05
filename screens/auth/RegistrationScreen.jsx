@@ -1,4 +1,9 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { addUser } from "../../redux/auth/actions";
+import { v4 as uuidv4 } from "uuid";
+
+import { styles } from "./RegistrationScreen.styles";
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
 import {
@@ -6,7 +11,6 @@ import {
   KeyboardAvoidingView,
   Image,
   Platform,
-  StyleSheet,
   Text,
   View,
   ImageBackground,
@@ -31,6 +35,7 @@ const {
 import { AntDesign } from "@expo/vector-icons";
 
 const initialState = {
+  id: "",
   avatar: "",
   login: "",
   email: "",
@@ -38,7 +43,7 @@ const initialState = {
 };
 
 export default function RegistrationScreen({ navigation }) {
-  const [state, setState] = useState(initialState);
+  const [user, setUser] = useState(initialState);
   const [image, setImage] = useState(null);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [dimensions, setDimensions] = useState(Dimensions.get("window").width);
@@ -47,8 +52,14 @@ export default function RegistrationScreen({ navigation }) {
   const [inputEmailActive, setInputEmailActive] = useState(false);
   const [inputPasswordActive, setInputPasswordActive] = useState(false);
 
+  const dispatch = useDispatch();
+
+  // const email = useSelector((state) => state.auth);
+  // console.log(email);
+
+  // Завантаження аватарки
   const getImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [1, 1],
@@ -57,31 +68,38 @@ export default function RegistrationScreen({ navigation }) {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
-      setState((prevstate) => ({ ...prevstate, avatar: result.assets[0].uri }));
+      setUser((prevstate) => ({
+        ...prevstate,
+        avatar: result.assets[0].uri,
+      }));
     }
   };
 
+  // Видалення аватарки
   const deleteAvatar = () => {
     setImage(null);
   };
 
+  // Закриття клавіатури
   const keboardHide = () => {
-    console.log(state);
-
     setIsShowKeyboard(false);
     Keyboard.dismiss();
-    setState(initialState);
+  };
+
+  // Відправка і очистка форми
+  const submit = () => {
+    console.log(user);
+
+    dispatch(addUser(user));
+    setIsShowKeyboard(false);
+    Keyboard.dismiss();
+    setUser(initialState);
     setImage(null);
     setPasswordIsHide(true);
   };
 
-  const touchableWithout = () => {
-    setIsShowKeyboard(false);
-    Keyboard.dismiss();
-  };
-
   return (
-    <TouchableWithoutFeedback onPress={touchableWithout}>
+    <TouchableWithoutFeedback onPress={keboardHide}>
       <View style={styles.container}>
         <ImageBackground
           source={require("../../assets/images/sea.jpg")}
@@ -142,7 +160,7 @@ export default function RegistrationScreen({ navigation }) {
                 placeholder={"Логін"}
                 placeholderTextColor={placeholderColor}
                 cursorColor={acentColor}
-                value={state.login}
+                value={user.login}
                 onFocus={() => {
                   setInputLoginActive(true);
                   setIsShowKeyboard(true);
@@ -151,7 +169,7 @@ export default function RegistrationScreen({ navigation }) {
                   setInputLoginActive(false);
                 }}
                 onChangeText={(value) =>
-                  setState((prevstate) => ({ ...prevstate, login: value }))
+                  setUser((prevstate) => ({ ...prevstate, login: value }))
                 }
                 onSubmitEditing={() => {
                   keboardHide();
@@ -170,7 +188,7 @@ export default function RegistrationScreen({ navigation }) {
                 placeholder={"Адреса електронної пошти"}
                 placeholderTextColor={placeholderColor}
                 cursorColor={acentColor}
-                value={state.email}
+                value={user.email}
                 onFocus={() => {
                   setInputEmailActive(true);
                   setIsShowKeyboard(true);
@@ -179,7 +197,7 @@ export default function RegistrationScreen({ navigation }) {
                   setInputEmailActive(false);
                 }}
                 onChangeText={(value) =>
-                  setState((prevstate) => ({ ...prevstate, email: value }))
+                  setUser((prevstate) => ({ ...prevstate, email: value }))
                 }
                 onSubmitEditing={() => {
                   keboardHide();
@@ -199,7 +217,7 @@ export default function RegistrationScreen({ navigation }) {
                   placeholder={"Пароль"}
                   placeholderTextColor={placeholderColor}
                   cursorColor={acentColor}
-                  value={state.password}
+                  value={user.password}
                   secureTextEntry={passwordIsHide}
                   onFocus={() => {
                     setInputPasswordActive(true);
@@ -209,7 +227,7 @@ export default function RegistrationScreen({ navigation }) {
                     setInputPasswordActive(false);
                   }}
                   onChangeText={(value) =>
-                    setState((prevstate) => ({
+                    setUser((prevstate) => ({
                       ...prevstate,
                       password: value,
                     }))
@@ -233,7 +251,7 @@ export default function RegistrationScreen({ navigation }) {
                 </TouchableOpacity>
               </View>
               <SubmitBtn
-                submit={keboardHide}
+                submit={submit}
                 bgColor={acentColor}
                 titleColor={backgroundColor}
                 title="Зареєструватися"
@@ -253,63 +271,3 @@ export default function RegistrationScreen({ navigation }) {
     </TouchableWithoutFeedback>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: backgroundColor,
-    justifyContent: "center",
-  },
-  backgroundImg: {
-    flex: 1,
-    resizeMode: "cover",
-    justifyContent: "flex-end",
-  },
-  form: {
-    backgroundColor: backgroundColor,
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
-    paddingLeft: 16,
-    paddingRight: 16,
-  },
-  avatarView: {
-    position: "absolute",
-    top: -60,
-    borderRadius: 16,
-    backgroundColor: imputBackgroundColor,
-    width: 120,
-    height: 120,
-  },
-  avatarImage: {
-    height: 120,
-    width: 120,
-    borderRadius: 16,
-  },
-  addIcon: {
-    position: "absolute",
-    top: 80,
-    right: -12,
-    backgroundColor: backgroundColor,
-    borderRadius: 50,
-  },
-  title: {
-    marginTop: 92,
-  },
-
-  showPasswordBtn: {
-    position: "absolute",
-    top: 28,
-    right: 16,
-  },
-
-  goLogin: {
-    marginTop: 16,
-    marginBottom: 78,
-  },
-  goLoginTitle: {
-    fontSize: 16,
-    fontWeight: "400",
-    textAlign: "center",
-    color: linkColor,
-  },
-});

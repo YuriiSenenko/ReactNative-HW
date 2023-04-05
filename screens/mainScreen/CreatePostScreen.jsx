@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { styles } from "./CreatePostScreen.styles";
 import * as Location from "expo-location";
 import {
-  StyleSheet,
   View,
   Text,
   TextInput,
@@ -38,8 +38,8 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const initialState = {
   photo: null,
-  name: "",
-  location: "",
+  name: null,
+  location: null,
   coords: null,
 };
 
@@ -76,31 +76,31 @@ export const CreatePostScreen = ({ navigation }) => {
     Keyboard.dismiss();
   };
 
+  // отримую фото і координати, записую в State
   const takePhoto = async () => {
     const result = await camera.takePictureAsync();
+
     const currentlocation = await Location.getCurrentPositionAsync();
     setPhoto(result.uri);
     setState((prevstate) => ({
       ...prevstate,
+
       photo: result.uri,
+
       coords: currentlocation.coords,
     }));
   };
 
+  // При кліку на кнопку відпраки, якщо немає фото, виволить Alert
   const alert = () => Alert.alert("Зробіть фото");
 
+  // Передаю стейт на сторінку публікації
   const submit = async () => {
-    // const currentlocation = await Location.getCurrentPositionAsync();
-    // setLocation(currentlocation);
-    // setState((prevstate) => ({
-    //   ...prevstate,
-    //   coords: currentlocation.coords,
-    // }));
-
-    navigation.navigate("Публікації", { state }); // Передаю стейт на сторінку публікації
+    navigation.navigate("Публікації", { state });
     clearForm();
   };
 
+  // Очистка форми
   const clearForm = () => {
     setPhoto(null);
     setState(initialState);
@@ -109,17 +109,20 @@ export const CreatePostScreen = ({ navigation }) => {
   return (
     <TouchableWithoutFeedback onPress={touchableWithout}>
       <View style={styles.container}>
-        <ScrollView>
-          <View style={styles.form}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" && "padding"}>
+          <View
+            style={{ ...styles.form, marginTop: isShowKeyboard ? -10 : 32 }}
+          >
             <View style={styles.photoContainer}>
               <View style={styles.preView}>
-                <PhotoCamera newPhoto={takePhoto} camera={setCamera} />
-                {photo && (
+                {photo ? (
                   <Image
                     onPress={touchableWithout}
                     style={styles.photo}
                     source={{ uri: photo }}
                   ></Image>
+                ) : (
+                  <PhotoCamera newPhoto={takePhoto} camera={setCamera} />
                 )}
               </View>
               <TouchableOpacity>
@@ -156,6 +159,9 @@ export const CreatePostScreen = ({ navigation }) => {
               onChangeText={(value) =>
                 setState((prevstate) => ({ ...prevstate, name: value }))
               }
+              onSubmitEditing={() => {
+                touchableWithout();
+              }}
             ></TextInput>
             <View>
               <SimpleLineIcons
@@ -175,8 +181,14 @@ export const CreatePostScreen = ({ navigation }) => {
                   setIsShowKeyboard(true);
                 }}
                 onChangeText={(value) =>
-                  setState((prevstate) => ({ ...prevstate, location: value }))
+                  setState((prevstate) => ({
+                    ...prevstate,
+                    location: value,
+                  }))
                 }
+                onSubmitEditing={() => {
+                  touchableWithout();
+                }}
               ></TextInput>
             </View>
             {!photo ? (
@@ -195,72 +207,19 @@ export const CreatePostScreen = ({ navigation }) => {
               />
             )}
           </View>
-          <View style={styles.buttonDeleteContainer}>
-            <TouchableOpacity
-              activeOpacity={0.6}
-              style={styles.buttonDelete}
-              onPress={clearForm}
-            >
-              <AntDesign name="delete" size={24} color={placeholderColor} />
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
+        </KeyboardAvoidingView>
+        <View style={styles.buttonDeleteContainer}>
+          <TouchableOpacity
+            activeOpacity={0.6}
+            style={styles.buttonDelete}
+            onPress={clearForm}
+          >
+            <AntDesign name="delete" size={24} color={placeholderColor} />
+          </TouchableOpacity>
+        </View>
       </View>
     </TouchableWithoutFeedback>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: backgroundColor,
-  },
-  form: {
-    marginTop: 32,
-
-    marginHorizontal: 16,
-  },
-  photoContainer: {
-    height: 267,
-  },
-  preView: {
-    height: 240,
-    backgroundColor: imputBackgroundColor,
-    borderColor: borderColor,
-    borderWidth: 1,
-    borderRadius: 8,
-    marginBottom: 8,
-    // justifyContent: "center",
-    // alignItems: "center",
-  },
-
-  photoText: {
-    color: placeholderColor,
-  },
-  input: {
-    height: 50,
-    borderBottomWidth: 1,
-    borderColor: borderColor,
-    color: textColor,
-    fontSize: 16,
-  },
-  locationIcon: {
-    position: "absolute",
-    top: 27,
-  },
-  buttonDeleteContainer: {
-    // marginTop: 30,
-    alignItems: "center",
-    // marginBottom: 34,
-  },
-  buttonDelete: {
-    // marginTop: 30,
-    justifyContent: "center",
-    alignItems: "center",
-    width: 70,
-    height: 40,
-    backgroundColor: imputBackgroundColor,
-    borderRadius: 20,
-  },
-});
 export default CreatePostScreen;

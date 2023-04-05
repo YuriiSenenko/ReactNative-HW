@@ -1,4 +1,7 @@
 import React from "react";
+import { useDispatch } from "react-redux";
+import { logOut } from "../../redux/auth/actions";
+
 import PostsScreen from "../nestedScreens/PostsScreen";
 import CommentsScreen from "../nestedScreens/CommentsScreen";
 import MapScreen from "../nestedScreens/MapScreen";
@@ -13,6 +16,11 @@ import { AntDesign } from "@expo/vector-icons";
 const NestedScreen = createNativeStackNavigator();
 
 const Home = () => {
+  const dispatch = useDispatch();
+  const logOutUser = () => {
+    dispatch(logOut());
+  };
+
   return (
     <NestedScreen.Navigator
       screenOptions={{
@@ -32,7 +40,7 @@ const Home = () => {
         options={{
           headerRight: () => (
             <Feather
-              onPress={() => alert("This is a button!")}
+              onPress={logOutUser}
               name="log-out"
               size={24}
               color={placeholderColor}
@@ -44,6 +52,7 @@ const Home = () => {
       <NestedScreen.Group
         screenOptions={({ navigation }) => ({
           presentation: "modal",
+          tabBarStyle: { display: "none" },
           headerLeft: () => (
             <AntDesign
               onPress={() => navigation.goBack()}
@@ -55,12 +64,12 @@ const Home = () => {
         })}
       >
         <NestedScreen.Screen
-          // options={{ headerShown: false }}
+          // options={{ barStyle: { display: "none" } }}
           name="Коментарі"
           component={CommentsScreen}
         />
         <NestedScreen.Screen
-          // options={{ headerShown: false }}
+          // options={{ barStyle: { display: "none" } }}
           name="Карта"
           component={MapScreen}
         />

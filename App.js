@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import useRoute from "./router";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
+import AppRouting from "./components/AppRouting";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -13,7 +14,7 @@ export default function App() {
     "Inter-500": require("./assets/fonts/Inter-Medium.ttf"),
   });
 
-  const routing = useRoute({});
+  // const routing = useRoute();
 
   if (!fontsLoaded) {
     return null;
@@ -21,7 +22,8 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <NavigationContainer>{routing}</NavigationContainer>
+      <AppRouting />
+      {/* <NavigationContainer>{routing}</NavigationContainer> */}
     </Provider>
   );
 }

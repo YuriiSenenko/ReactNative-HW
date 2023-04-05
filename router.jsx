@@ -1,4 +1,8 @@
 import React from "react";
+
+import { useSelector } from "react-redux";
+// import { getUser } from "./redux/auth/selectors";
+
 import { StyleSheet, View } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -26,20 +30,20 @@ const useRoute = (isAuth) => {
       <AuthStack.Navigator>
         <AuthStack.Screen
           options={{ headerShown: false }}
-          name="Register"
-          component={RegistrationScreen}
+          name="Login"
+          component={LoginScreen}
         />
         <AuthStack.Screen
           options={{ headerShown: false }}
-          name="Login"
-          component={LoginScreen}
+          name="Register"
+          component={RegistrationScreen}
         />
       </AuthStack.Navigator>
     );
   }
   return (
     <Tab.Navigator
-      initialRouteName="Публікації"
+      // initialRouteName="Публікації"
       screenOptions={{
         headerTitleAlign: "center",
         headerTitleStyle: {

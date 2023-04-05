@@ -1,11 +1,11 @@
 import React, { useState } from "react";
+import { styles } from "./LoginScreen.styles";
 import { SubmitBtn } from "../../components/SubmitBtn";
 import { StatusBar } from "expo-status-bar";
 import {
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
   Text,
   View,
   ImageBackground,
@@ -36,22 +36,24 @@ export default function LoginScreen({ navigation }) {
   const [inputEmailActive, setInputEmailActive] = useState(false);
   const [inputPasswordActive, setInputPasswordActive] = useState(false);
 
+  // Закриття клавіатури
   const keboardHide = () => {
+    setIsShowKeyboard(false);
+    Keyboard.dismiss();
+  };
+
+  // Відправка і очистка форми
+  const submit = () => {
+    console.log(state);
+
     setIsShowKeyboard(false);
     Keyboard.dismiss();
     setState(initialState);
     setPasswordIsHide(true);
-
-    console.log(state);
-  };
-
-  const touchableWithout = () => {
-    setIsShowKeyboard(false);
-    Keyboard.dismiss();
   };
 
   return (
-    <TouchableWithoutFeedback onPress={touchableWithout}>
+    <TouchableWithoutFeedback onPress={keboardHide}>
       <View style={styles.container}>
         <ImageBackground
           source={require("../../assets/images/sea.jpg")}
@@ -138,7 +140,8 @@ export default function LoginScreen({ navigation }) {
                 </TouchableOpacity>
               </View>
               <SubmitBtn
-                submit={keboardHide}
+                // style={{ disabled: true }}
+                submit={submit}
                 bgColor={acentColor}
                 titleColor={backgroundColor}
                 title="Ввійти"
@@ -161,42 +164,3 @@ export default function LoginScreen({ navigation }) {
     </TouchableWithoutFeedback>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: backgroundColor,
-    // justifyContent: "center",
-  },
-  backgroundImg: {
-    flex: 1,
-    resizeMode: "cover",
-    justifyContent: "flex-end",
-    // alignItems: "center",
-  },
-  form: {
-    backgroundColor: backgroundColor,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    paddingLeft: 16,
-    paddingRight: 16,
-  },
-
-  title: {
-    marginTop: 32,
-  },
-
-  showPasswordBtn: {
-    position: "absolute",
-    top: 28,
-    right: 16,
-  },
-
-  loginBtn: {
-    fontSize: 16,
-
-    fontWeight: "400",
-    textAlign: "center",
-    color: linkColor,
-  },
-});

@@ -11,17 +11,3 @@ export const colors = {
   linkColor: "#1B4371",
   goBackIconColor: "#21212180",
 };
-
-/*  const {
-    iconCameraColor,
-    iconCameraBGColor,
-    backgroundColor,
-    acentColor,
-    imputBackgroundColor,
-    borderColor,
-    secondaryTextColor,
-    textColor,
-    placeholderColor,
-    linkColor,
-    goBackIconColor
-  } = colors;  */
