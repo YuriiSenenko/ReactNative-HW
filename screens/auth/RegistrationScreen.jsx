@@ -74,7 +74,6 @@ export default function RegistrationScreen({ navigation }) {
         password: values.password,
       }));
       submit();
-      // onSubmit({ values, action });
     },
   });
 
@@ -210,7 +209,12 @@ export default function RegistrationScreen({ navigation }) {
                   placeholder={"Логін"}
                   placeholderTextColor={placeholderColor}
                   cursorColor={acentColor}
-                  value={formik.values.login}
+                  // value={formik.values.login}
+                  value={
+                    !inputLoginActive && formik.errors.login
+                      ? formik.errors.login
+                      : formik.values.login
+                  }
                   validate={registerSchema.login}
                   onChangeText={formik.handleChange("login")}
                   onFocus={() => {
@@ -242,7 +246,12 @@ export default function RegistrationScreen({ navigation }) {
                   autoComplete={"email"}
                   placeholderTextColor={placeholderColor}
                   cursorColor={acentColor}
-                  value={formik.values.email}
+                  // value={formik.values.email}
+                  value={
+                    !inputEmailActive && formik.errors.email
+                      ? formik.errors.email
+                      : formik.values.email
+                  }
                   validate={registerSchema.email}
                   onChangeText={formik.handleChange("email")}
                   onFocus={() => {
@@ -273,8 +282,16 @@ export default function RegistrationScreen({ navigation }) {
                     autoComplete={"new-password"}
                     placeholderTextColor={placeholderColor}
                     cursorColor={acentColor}
-                    secureTextEntry={passwordIsHide}
-                    value={formik.values.password}
+                    secureTextEntry={
+                      !inputPasswordActive && formik.errors.password
+                        ? false
+                        : passwordIsHide
+                    }
+                    value={
+                      !inputPasswordActive && formik.errors.password
+                        ? formik.errors.password
+                        : formik.values.password
+                    }
                     validate={registerSchema.password}
                     onChangeText={formik.handleChange("password")}
                     onFocus={() => {

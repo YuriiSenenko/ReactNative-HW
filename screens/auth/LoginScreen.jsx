@@ -140,7 +140,11 @@ export default function LoginScreen({ navigation }) {
                   placeholder={"Адреса електронної пошти"}
                   placeholderTextColor={placeholderColor}
                   cursorColor={acentColor}
-                  value={formik.values.email}
+                  value={
+                    !inputEmailActive && formik.errors.email
+                      ? formik.errors.email
+                      : formik.values.email
+                  }
                   validate={loginSchema.email}
                   onChangeText={formik.handleChange("email")}
                   onFocus={() => {
@@ -169,8 +173,17 @@ export default function LoginScreen({ navigation }) {
                     placeholder={"Пароль"}
                     placeholderTextColor={placeholderColor}
                     cursorColor={acentColor}
-                    secureTextEntry={passwordIsHide}
-                    value={formik.values.password}
+                    secureTextEntry={
+                      !inputPasswordActive && formik.errors.password
+                        ? false
+                        : passwordIsHide
+                    }
+                    // value={formik.values.password}
+                    value={
+                      !inputPasswordActive && formik.errors.password
+                        ? formik.errors.password
+                        : formik.values.password
+                    }
                     validate={loginSchema.password}
                     onChangeText={formik.handleChange("password")}
                     onFocus={() => {
