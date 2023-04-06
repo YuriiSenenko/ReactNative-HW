@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 import { colors } from "../../styles/colors";
-const { backgroundColor, imputBackgroundColor, linkColor } = colors;
+const { backgroundColor, inputBackgroundColor, linkColor } = colors;
 
 export const styles = StyleSheet.create({
   container: {
@@ -24,7 +24,7 @@ export const styles = StyleSheet.create({
     position: "absolute",
     top: -60,
     borderRadius: 16,
-    backgroundColor: imputBackgroundColor,
+    backgroundColor: inputBackgroundColor,
     width: 120,
     height: 120,
   },

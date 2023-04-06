@@ -1,4 +1,10 @@
 import React, { useState } from "react";
+import { useFormik, Formik } from "formik";
+import { loginSchema } from "../../components/shemas/Shemas";
+
+import { useDispatch } from "react-redux";
+import { addUser } from "../../redux/auth/actions";
+
 import { styles } from "./LoginScreen.styles";
 import { SubmitBtn } from "../../components/SubmitBtn";
 import { StatusBar } from "expo-status-bar";
@@ -18,10 +24,11 @@ import { colors } from "../../styles/colors";
 const {
   backgroundColor,
   acentColor,
-  imputBackgroundColor,
+  inputBackgroundColor,
   borderColor,
   placeholderColor,
   linkColor,
+  successColor,
 } = colors;
 
 const initialState = {
@@ -30,27 +37,72 @@ const initialState = {
 };
 
 export default function LoginScreen({ navigation }) {
-  const [state, setState] = useState(initialState);
+  const [user, setUser] = useState(initialState);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [passwordIsHide, setPasswordIsHide] = useState(true);
   const [inputEmailActive, setInputEmailActive] = useState(false);
   const [inputPasswordActive, setInputPasswordActive] = useState(false);
 
-  // Закриття клавіатури
+  const dispatch = useDispatch();
+
+  //! Formik
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validationSchema: loginSchema,
+
+    onSubmit: (values, action) => {
+      setUser((prevstate) => ({
+        ...prevstate,
+        email: values.email,
+        password: values.password,
+      }));
+
+      dispatch(addUser(values));
+      console.log(values);
+
+      // submit();
+      // onSubmit({ values, action });
+    },
+  });
+
+  //! Зміна кольору input
+  const inpuBorderColor = (inputActive, hasValue, error) => {
+    if (!inputActive && !error && !hasValue) {
+      borderInput = borderColor;
+    } else if (inputActive && !error && !hasValue) {
+      borderInput = acentColor;
+    } else if (inputActive && error) {
+      borderInput = acentColor;
+    } else if (inputActive && !error) {
+      borderInput = successColor;
+    } else if (!inputActive && !error) {
+      borderInput = successColor;
+    } else if (!inputActive && error) {
+      borderInput = acentColor;
+    }
+    return borderInput;
+  };
+  const inputBackground = (inputActive) => {
+    return !inputActive ? inputBackgroundColor : backgroundColor;
+  };
+
+  //! Закриття клавіатури
   const keboardHide = () => {
     setIsShowKeyboard(false);
     Keyboard.dismiss();
   };
 
-  // Відправка і очистка форми
-  const submit = () => {
-    console.log(state);
-
-    setIsShowKeyboard(false);
-    Keyboard.dismiss();
-    setState(initialState);
-    setPasswordIsHide(true);
-  };
+  //! Відправка і очистка форми
+  // const submit = () => {
+  //   dispatch(addUser(user));
+  //   setIsShowKeyboard(false);
+  //   Keyboard.dismiss();
+  //   setUser(initialState);
+  //   setPasswordIsHide(true);
+  // };
 
   return (
     <TouchableWithoutFeedback onPress={keboardHide}>
@@ -60,103 +112,112 @@ export default function LoginScreen({ navigation }) {
           style={styles.backgroundImg}
         >
           <KeyboardAvoidingView behavior={Platform.OS === "ios" && "padding"}>
-            <View
-              style={{
-                ...styles.form,
-                marginBottom: isShowKeyboard ? -250 : 0,
-              }}
-            >
-              <Text style={{ ...globalStyle.title, ...styles.title }}>
-                Вхід
-              </Text>
-
-              <TextInput
+            <Formik validationSchema={loginSchema}>
+              <View
                 style={{
-                  ...globalStyle.input,
-                  backgroundColor: inputEmailActive
-                    ? backgroundColor
-                    : imputBackgroundColor,
-                  borderColor: inputEmailActive ? acentColor : borderColor,
+                  ...styles.form,
+                  marginBottom: isShowKeyboard ? -250 : 0,
                 }}
-                placeholder={"Адреса електронної пошти"}
-                placeholderTextColor={placeholderColor}
-                cursorColor={acentColor}
-                value={state.email}
-                onFocus={() => {
-                  setInputEmailActive(true);
-                  setIsShowKeyboard(true);
-                }}
-                onBlur={() => {
-                  setInputEmailActive(false);
-                }}
-                onChangeText={(value) =>
-                  setState((prevstate) => ({ ...prevstate, email: value }))
-                }
-                onSubmitEditing={() => {
-                  keboardHide();
-                }}
-              ></TextInput>
-              <View>
+              >
+                <Text style={{ ...globalStyle.title, ...styles.title }}>
+                  Вхід
+                </Text>
+
                 <TextInput
                   style={{
                     ...globalStyle.input,
                     marginTop: 16,
-                    backgroundColor: inputPasswordActive
-                      ? backgroundColor
-                      : imputBackgroundColor,
-                    borderColor: inputPasswordActive ? acentColor : borderColor,
+                    backgroundColor: inputBackground(inputEmailActive),
+                    borderColor: inpuBorderColor(
+                      inputEmailActive,
+                      formik.values.email,
+                      formik.errors.email
+                    ),
                   }}
-                  placeholder={"Пароль"}
+                  inputMode={"email"}
+                  autoCapitalize={"none"}
+                  autoComplete={"email"}
+                  placeholder={"Адреса електронної пошти"}
                   placeholderTextColor={placeholderColor}
                   cursorColor={acentColor}
-                  value={state.password}
-                  secureTextEntry={passwordIsHide}
+                  value={formik.values.email}
+                  validate={loginSchema.email}
+                  onChangeText={formik.handleChange("email")}
                   onFocus={() => {
-                    setInputPasswordActive(true);
+                    setInputEmailActive(true);
                     setIsShowKeyboard(true);
                   }}
                   onBlur={() => {
-                    setInputPasswordActive(false);
+                    formik.handleBlur("email"), setInputEmailActive(false);
                   }}
-                  onChangeText={(value) =>
-                    setState((prevstate) => ({ ...prevstate, password: value }))
-                  }
                   onSubmitEditing={() => {
                     keboardHide();
                   }}
                 ></TextInput>
+                <View>
+                  <TextInput
+                    style={{
+                      ...globalStyle.input,
+                      marginTop: 16,
+                      backgroundColor: inputBackground(inputPasswordActive),
+                      borderColor: inpuBorderColor(
+                        inputPasswordActive,
+                        formik.values.password,
+                        formik.errors.password
+                      ),
+                    }}
+                    placeholder={"Пароль"}
+                    placeholderTextColor={placeholderColor}
+                    cursorColor={acentColor}
+                    secureTextEntry={passwordIsHide}
+                    value={formik.values.password}
+                    validate={loginSchema.password}
+                    onChangeText={formik.handleChange("password")}
+                    onFocus={() => {
+                      setInputPasswordActive(true);
+                      setIsShowKeyboard(true);
+                    }}
+                    onBlur={() => {
+                      formik.handleBlur("password"),
+                        setInputPasswordActive(false);
+                    }}
+                    onSubmitEditing={() => {
+                      keboardHide();
+                    }}
+                  ></TextInput>
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    style={styles.showPasswordBtn}
+                    onPress={() =>
+                      passwordIsHide
+                        ? setPasswordIsHide(false)
+                        : setPasswordIsHide(true)
+                    }
+                  >
+                    <Text style={{ fontSize: 16, color: linkColor }}>
+                      {passwordIsHide ? "Показати" : "Приховати"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <SubmitBtn
+                  type="submit"
+                  submit={formik.handleSubmit}
+                  bgColor={acentColor}
+                  titleColor={backgroundColor}
+                  title="Ввійти"
+                />
+
                 <TouchableOpacity
-                  activeOpacity={0.7}
-                  style={styles.showPasswordBtn}
-                  onPress={() =>
-                    passwordIsHide
-                      ? setPasswordIsHide(false)
-                      : setPasswordIsHide(true)
-                  }
+                  style={{ marginTop: 16, marginBottom: 144 }}
+                  activeOpacity={0.6}
+                  onPress={() => navigation.navigate("Register")}
                 >
-                  <Text style={{ fontSize: 16, color: linkColor }}>
-                    {passwordIsHide ? "Показати" : "Приховати"}
+                  <Text style={styles.loginBtn}>
+                    Немає аккаунта? Зареєструватися
                   </Text>
                 </TouchableOpacity>
               </View>
-              <SubmitBtn
-                // style={{ disabled: true }}
-                submit={submit}
-                bgColor={acentColor}
-                titleColor={backgroundColor}
-                title="Ввійти"
-              />
-
-              <TouchableOpacity
-                style={{ marginTop: 16, marginBottom: 144 }}
-                activeOpacity={0.6}
-                onPress={() => navigation.navigate("Register")}
-              >
-                <Text style={styles.loginBtn}>
-                  Немає аккаунта? Зареєструватися
-                </Text>
-              </TouchableOpacity>
-            </View>
+            </Formik>
           </KeyboardAvoidingView>
         </ImageBackground>
         <StatusBar style="auto" />

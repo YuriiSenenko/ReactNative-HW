@@ -1,4 +1,7 @@
 import { isLoading } from "expo-font";
+import { useSelector } from "react-redux";
+
+import { getUser } from "../../redux/auth/selectors";
 import React, { useState, useEffect } from "react";
 import { styles } from "./PostsScreen.styles";
 import {
@@ -36,8 +39,9 @@ const initialState = {
 export default function PostsScreen({ navigation, route }) {
   const [isLoading, setIsLoading] = useState(true);
   const [posts, setPosts] = useState([]);
+  const user = useSelector(getUser);
+  const { avatar, login, email } = user.user;
 
-  // console.log(route.params);
   // const fetchPosts = () => {
   //   fetch("https://6404410580d9c5c7bac3f01d.mockapi.io/userPosts")
   //     .then((response) => {
@@ -77,13 +81,10 @@ export default function PostsScreen({ navigation, route }) {
   return (
     <View style={styles.container}>
       <View style={styles.userCard}>
-        <Image
-          style={styles.avatarImage}
-          source={{ uri: "https://loremflickr.com/640/480/abstract" }}
-        />
+        <Image style={styles.avatarImage} source={{ uri: avatar }} />
         <View style={styles.userData}>
-          <Text style={styles.userName}>Yurii Senenko</Text>
-          <Text style={styles.userEmail}>yuriisenenko@mail.com</Text>
+          <Text style={styles.userName}>{login}</Text>
+          <Text style={styles.userEmail}>{email}</Text>
         </View>
       </View>
       <View style={styles.postsListContainer}>

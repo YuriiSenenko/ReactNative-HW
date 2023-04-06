@@ -12,7 +12,7 @@ import { colors } from "../../styles/colors";
 const {
   backgroundColor,
   acentColor,
-  imputBackgroundColor,
+  inputBackgroundColor,
   borderColor,
   placeholderColor,
 } = colors;

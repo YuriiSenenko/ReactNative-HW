@@ -3,7 +3,7 @@ import { colors } from "../../styles/colors";
 const {
   backgroundColor,
   acentColor,
-  imputBackgroundColor,
+  inputBackgroundColor,
   borderColor,
   placeholderColor,
 } = colors;
@@ -45,7 +45,7 @@ export const styles = StyleSheet.create({
     borderTopRightRadius: 6,
     borderBottomRightRadius: 6,
     borderBottomLeftRadius: 6,
-    backgroundColor: imputBackgroundColor,
+    backgroundColor: inputBackgroundColor,
   },
   commentText: {},
   commentData: {
@@ -60,7 +60,7 @@ export const styles = StyleSheet.create({
     borderTopLeftRadius: 6,
     borderBottomRightRadius: 6,
     borderBottomLeftRadius: 6,
-    backgroundColor: imputBackgroundColor,
+    backgroundColor: inputBackgroundColor,
   },
   commentGuestText: {},
   commentGuestData: {
@@ -78,7 +78,7 @@ export const styles = StyleSheet.create({
     height: 50,
     borderRadius: 100,
     borderWidth: 1,
-    backgroundColor: imputBackgroundColor,
+    backgroundColor: inputBackgroundColor,
     borderColor: borderColor,
     fontFamily: "Inter-500",
     fontSize: 16,

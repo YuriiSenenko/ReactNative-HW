@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { styles } from "./CreatePostScreen.styles";
 import * as Location from "expo-location";
 import {
@@ -17,7 +18,7 @@ import { colors } from "../../styles/colors";
 const {
   backgroundColor,
   acentColor,
-  imputBackgroundColor,
+  inputBackgroundColor,
   borderColor,
   textColor,
   placeholderColor,
@@ -52,18 +53,39 @@ export const CreatePostScreen = ({ navigation }) => {
   const [photo, setPhoto] = useState(null);
   const [location, setLocation] = useState(null);
 
+  (async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      setErrorMsg("Permission to access location was denied");
+      return;
+    }
+  })();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      (async () => {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setErrorMsg("Permission to access location was denied");
+          return;
+        }
+      })();
+      return () => {
+        // Do something when the screen is unfocused
+        // Useful for cleanup functions
+      };
+    }, [])
+  );
+
   // useEffect(() => {
-  //   setCameraIsActive(false);
-  // }, [photo]);
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
-    })();
-  }, []);
+  //   (async () => {
+  //     let { status } = await Location.requestForegroundPermissionsAsync();
+  //     if (status !== "granted") {
+  //       setErrorMsg("Permission to access location was denied");
+  //       return;
+  //     }
+  //   })();
+  // }, []);
 
   const keboardHide = () => {
     setIsShowKeyboard(false);
@@ -92,7 +114,10 @@ export const CreatePostScreen = ({ navigation }) => {
   };
 
   // При кліку на кнопку відпраки, якщо немає фото, виволить Alert
-  const alert = () => Alert.alert("Зробіть фото");
+  const alert = () => {
+    Alert.alert("Зробіть фото");
+    return;
+  };
 
   // Передаю стейт на сторінку публікації
   const submit = async () => {
@@ -107,118 +132,116 @@ export const CreatePostScreen = ({ navigation }) => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={touchableWithout}>
-      <View style={styles.container}>
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" && "padding"}>
-          <View
-            style={{ ...styles.form, marginTop: isShowKeyboard ? -10 : 32 }}
-          >
-            <View style={styles.photoContainer}>
-              <View style={styles.preView}>
-                {photo ? (
-                  <Image
-                    onPress={touchableWithout}
-                    style={styles.photo}
-                    source={{ uri: photo }}
-                  ></Image>
-                ) : (
-                  <PhotoCamera newPhoto={takePhoto} camera={setCamera} />
-                )}
-              </View>
-              <TouchableOpacity>
-                {photo ? (
-                  <View>
-                    <Text
-                      onPress={() => {
-                        setPhoto(null);
-                      }}
-                      style={styles.photoText}
-                    >
-                      Змінити фото
-                    </Text>
-                  </View>
-                ) : (
-                  <View>
-                    <Text onPress={() => {}} style={styles.photoText}>
-                      Завантажити фото
-                    </Text>
-                  </View>
-                )}
-              </TouchableOpacity>
+    // <TouchableWithoutFeedback onPress={touchableWithout}>
+    <View style={styles.container}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" && "padding"}>
+        <View style={{ ...styles.form, marginTop: isShowKeyboard ? -10 : 32 }}>
+          <View style={styles.photoContainer}>
+            <View style={styles.preView}>
+              {photo ? (
+                <Image
+                  onPress={touchableWithout}
+                  style={styles.photo}
+                  source={{ uri: photo }}
+                ></Image>
+              ) : (
+                <PhotoCamera newPhoto={takePhoto} camera={setCamera} />
+              )}
             </View>
+            <TouchableOpacity>
+              {photo ? (
+                <View>
+                  <Text
+                    onPress={() => {
+                      setPhoto(null);
+                    }}
+                    style={styles.photoText}
+                  >
+                    Змінити фото
+                  </Text>
+                </View>
+              ) : (
+                <View>
+                  <Text onPress={() => {}} style={styles.photoText}>
+                    Завантажити фото
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
+          <TextInput
+            style={styles.input}
+            inputMode={"text"}
+            placeholder={"Назва..."}
+            placeholderTextColor={placeholderColor}
+            cursorColor={acentColor}
+            value={state.name}
+            onFocus={() => {
+              setIsShowKeyboard(true);
+            }}
+            onChangeText={(value) =>
+              setState((prevstate) => ({ ...prevstate, name: value }))
+            }
+            onSubmitEditing={() => {
+              touchableWithout();
+            }}
+          ></TextInput>
+          <View>
+            <SimpleLineIcons
+              style={styles.locationIcon}
+              name="location-pin"
+              size={24}
+              color={placeholderColor}
+            />
             <TextInput
-              style={styles.input}
+              style={{ ...styles.input, marginTop: 16, paddingLeft: 28 }}
               inputMode={"text"}
-              placeholder={"Назва..."}
+              placeholder={"Локація..."}
               placeholderTextColor={placeholderColor}
               cursorColor={acentColor}
-              value={state.name}
+              value={state.location}
               onFocus={() => {
                 setIsShowKeyboard(true);
               }}
               onChangeText={(value) =>
-                setState((prevstate) => ({ ...prevstate, name: value }))
+                setState((prevstate) => ({
+                  ...prevstate,
+                  location: value,
+                }))
               }
               onSubmitEditing={() => {
                 touchableWithout();
               }}
             ></TextInput>
-            <View>
-              <SimpleLineIcons
-                style={styles.locationIcon}
-                name="location-pin"
-                size={24}
-                color={placeholderColor}
-              />
-              <TextInput
-                style={{ ...styles.input, marginTop: 16, paddingLeft: 28 }}
-                inputMode={"text"}
-                placeholder={"Локація..."}
-                placeholderTextColor={placeholderColor}
-                cursorColor={acentColor}
-                value={state.location}
-                onFocus={() => {
-                  setIsShowKeyboard(true);
-                }}
-                onChangeText={(value) =>
-                  setState((prevstate) => ({
-                    ...prevstate,
-                    location: value,
-                  }))
-                }
-                onSubmitEditing={() => {
-                  touchableWithout();
-                }}
-              ></TextInput>
-            </View>
-            {!photo ? (
-              <SubmitBtn
-                submit={alert}
-                bgColor={imputBackgroundColor}
-                titleColor={placeholderColor}
-                title="Опублікувати"
-              />
-            ) : (
-              <SubmitBtn
-                submit={submit}
-                bgColor={acentColor}
-                titleColor={backgroundColor}
-                title="Опублікувати"
-              />
-            )}
           </View>
-        </KeyboardAvoidingView>
-        <View style={styles.buttonDeleteContainer}>
-          <TouchableOpacity
-            activeOpacity={0.6}
-            style={styles.buttonDelete}
-            onPress={clearForm}
-          >
-            <AntDesign name="delete" size={24} color={placeholderColor} />
-          </TouchableOpacity>
+          {!photo ? (
+            <SubmitBtn
+              submit={alert}
+              bgColor={inputBackgroundColor}
+              titleColor={placeholderColor}
+              title="Опублікувати"
+            />
+          ) : (
+            <SubmitBtn
+              submit={submit}
+              bgColor={acentColor}
+              titleColor={backgroundColor}
+              title="Опублікувати"
+            />
+          )}
         </View>
+      </KeyboardAvoidingView>
+      <View style={styles.buttonDeleteContainer}>
+        <TouchableOpacity
+          activeOpacity={0.6}
+          style={styles.buttonDelete}
+          onPress={clearForm}
+        >
+          <AntDesign name="delete" size={24} color={placeholderColor} />
+        </TouchableOpacity>
       </View>
-    </TouchableWithoutFeedback>
+    </View>
+    // </TouchableWithoutFeedback>
   );
 };
 

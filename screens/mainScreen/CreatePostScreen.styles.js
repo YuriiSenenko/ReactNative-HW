@@ -3,7 +3,7 @@ import { colors } from "../../styles/colors";
 const {
   backgroundColor,
   acentColor,
-  imputBackgroundColor,
+  inputBackgroundColor,
   borderColor,
   textColor,
   placeholderColor,
@@ -25,7 +25,7 @@ export const styles = StyleSheet.create({
 
   preView: {
     height: 240,
-    backgroundColor: imputBackgroundColor,
+    backgroundColor: inputBackgroundColor,
     borderColor: borderColor,
     borderRadius: 8,
     marginBottom: 8,
@@ -59,7 +59,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     width: 70,
     height: 40,
-    backgroundColor: imputBackgroundColor,
+    backgroundColor: inputBackgroundColor,
     borderRadius: 20,
   },
 });

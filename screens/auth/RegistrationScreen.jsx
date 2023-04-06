@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useFormik, Formik } from "formik";
+import { registerSchema } from "../../components/shemas/Shemas";
+
 import { useDispatch } from "react-redux";
 import { addUser } from "../../redux/auth/actions";
-import { v4 as uuidv4 } from "uuid";
 
 import { styles } from "./RegistrationScreen.styles";
 import { StatusBar } from "expo-status-bar";
@@ -18,6 +20,7 @@ import {
   TouchableOpacity,
   Keyboard,
   Dimensions,
+  Alert,
 } from "react-native";
 import { SubmitBtn } from "../../components/SubmitBtn";
 import { globalStyle } from "../../styles/globalStyle";
@@ -25,21 +28,21 @@ import { colors } from "../../styles/colors";
 const {
   backgroundColor,
   acentColor,
-  imputBackgroundColor,
+  inputBackgroundColor,
   borderColor,
   placeholderColor,
   linkColor,
+  successColor,
 } = colors;
 
 // import icons
 import { AntDesign } from "@expo/vector-icons";
 
 const initialState = {
-  id: "",
-  avatar: "",
-  login: "",
-  email: "",
-  password: "",
+  avatar: null,
+  login: null,
+  email: null,
+  password: null,
 };
 
 export default function RegistrationScreen({ navigation }) {
@@ -54,10 +57,49 @@ export default function RegistrationScreen({ navigation }) {
 
   const dispatch = useDispatch();
 
-  // const email = useSelector((state) => state.auth);
-  // console.log(email);
+  //! Formik
+  const formik = useFormik({
+    initialValues: {
+      login: "",
+      email: "",
+      password: "",
+    },
+    validationSchema: registerSchema,
 
-  // Завантаження аватарки
+    onSubmit: (values, action) => {
+      setUser((prevstate) => ({
+        ...prevstate,
+        login: values.login,
+        email: values.email,
+        password: values.password,
+      }));
+      submit();
+      // onSubmit({ values, action });
+    },
+  });
+
+  //! Зміна кольору input
+  const inpuBorderColor = (inputActive, hasValue, error) => {
+    if (!inputActive && !error && !hasValue) {
+      borderInput = borderColor;
+    } else if (inputActive && !error && !hasValue) {
+      borderInput = acentColor;
+    } else if (inputActive && error) {
+      borderInput = acentColor;
+    } else if (inputActive && !error) {
+      borderInput = successColor;
+    } else if (!inputActive && !error) {
+      borderInput = successColor;
+    } else if (!inputActive && error) {
+      borderInput = acentColor;
+    }
+    return borderInput;
+  };
+  const inputBackground = (inputActive) => {
+    return !inputActive ? inputBackgroundColor : backgroundColor;
+  };
+
+  //! Завантаження аватарки
   const getImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -75,21 +117,25 @@ export default function RegistrationScreen({ navigation }) {
     }
   };
 
-  // Видалення аватарки
+  //! Видалення аватарки
   const deleteAvatar = () => {
     setImage(null);
   };
 
-  // Закриття клавіатури
+  //! Закриття клавіатури
   const keboardHide = () => {
     setIsShowKeyboard(false);
     Keyboard.dismiss();
   };
 
-  // Відправка і очистка форми
+  //! Відправка і очистка форми
   const submit = () => {
-    console.log(user);
+    if (!user.avatar) {
+      Alert.alert("Помилка в формі реєстрації:", "Завантажте фотографію!");
+      return;
+    }
 
+    console.log(user);
     dispatch(addUser(user));
     setIsShowKeyboard(false);
     Keyboard.dismiss();
@@ -106,164 +152,173 @@ export default function RegistrationScreen({ navigation }) {
           style={styles.backgroundImg}
         >
           <KeyboardAvoidingView behavior={Platform.OS === "ios" && "padding"}>
-            <View
-              style={{
-                ...styles.form,
-                marginBottom: isShowKeyboard ? -180 : 0,
-              }}
-            >
+            <Formik validationSchema={registerSchema}>
               <View
                 style={{
-                  ...styles.avatarView,
-                  left: dimensions / 2 - 60,
+                  ...styles.form,
+                  marginBottom: isShowKeyboard ? -180 : 0,
                 }}
               >
-                <Image style={styles.avatarImage} source={{ uri: image }} />
-                {!image ? (
-                  <TouchableOpacity
-                    style={styles.addIcon}
-                    activeOpacity={0.6}
-                    onPress={getImage}
-                  >
-                    <AntDesign
-                      name="pluscircleo"
-                      size={24}
-                      color={acentColor}
-                    />
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    style={styles.addIcon}
-                    activeOpacity={0.6}
-                    onPress={deleteAvatar}
-                  >
-                    <AntDesign
-                      name="closecircleo"
-                      size={24}
-                      color={placeholderColor}
-                    />
-                  </TouchableOpacity>
-                )}
-              </View>
-              <Text style={{ ...globalStyle.title, ...styles.title }}>
-                Реєстрація
-              </Text>
-              <TextInput
-                style={{
-                  ...globalStyle.input,
-                  backgroundColor: inputLoginActive
-                    ? backgroundColor
-                    : imputBackgroundColor,
-                  borderColor: inputLoginActive ? acentColor : borderColor,
-                }}
-                inputMode={"text"}
-                placeholder={"Логін"}
-                placeholderTextColor={placeholderColor}
-                cursorColor={acentColor}
-                value={user.login}
-                onFocus={() => {
-                  setInputLoginActive(true);
-                  setIsShowKeyboard(true);
-                }}
-                onBlur={() => {
-                  setInputLoginActive(false);
-                }}
-                onChangeText={(value) =>
-                  setUser((prevstate) => ({ ...prevstate, login: value }))
-                }
-                onSubmitEditing={() => {
-                  keboardHide();
-                }}
-              ></TextInput>
-              <TextInput
-                style={{
-                  ...globalStyle.input,
-                  marginTop: 16,
-                  backgroundColor: inputEmailActive
-                    ? backgroundColor
-                    : imputBackgroundColor,
-                  borderColor: inputEmailActive ? acentColor : borderColor,
-                }}
-                inputMode={"email"}
-                placeholder={"Адреса електронної пошти"}
-                placeholderTextColor={placeholderColor}
-                cursorColor={acentColor}
-                value={user.email}
-                onFocus={() => {
-                  setInputEmailActive(true);
-                  setIsShowKeyboard(true);
-                }}
-                onBlur={() => {
-                  setInputEmailActive(false);
-                }}
-                onChangeText={(value) =>
-                  setUser((prevstate) => ({ ...prevstate, email: value }))
-                }
-                onSubmitEditing={() => {
-                  keboardHide();
-                }}
-              ></TextInput>
-              <View>
+                <View
+                  style={{
+                    ...styles.avatarView,
+                    left: dimensions / 2 - 60,
+                  }}
+                >
+                  <Image style={styles.avatarImage} source={{ uri: image }} />
+                  {!image ? (
+                    <TouchableOpacity
+                      style={styles.addIcon}
+                      activeOpacity={0.6}
+                      onPress={getImage}
+                    >
+                      <AntDesign
+                        name="pluscircleo"
+                        size={24}
+                        color={acentColor}
+                      />
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.addIcon}
+                      activeOpacity={0.6}
+                      onPress={deleteAvatar}
+                    >
+                      <AntDesign
+                        name="closecircleo"
+                        size={24}
+                        color={placeholderColor}
+                      />
+                    </TouchableOpacity>
+                  )}
+                </View>
+                <Text style={{ ...globalStyle.title, ...styles.title }}>
+                  Реєстрація
+                </Text>
                 <TextInput
                   style={{
                     ...globalStyle.input,
-                    marginTop: 16,
-                    backgroundColor: inputPasswordActive
-                      ? backgroundColor
-                      : imputBackgroundColor,
-                    borderColor: inputPasswordActive ? acentColor : borderColor,
+                    backgroundColor: inputBackground(inputLoginActive),
+                    borderColor: inpuBorderColor(
+                      inputLoginActive,
+                      formik.values.login,
+                      formik.errors.login
+                    ),
                   }}
                   inputMode={"text"}
-                  placeholder={"Пароль"}
+                  maxLength={30}
+                  placeholder={"Логін"}
                   placeholderTextColor={placeholderColor}
                   cursorColor={acentColor}
-                  value={user.password}
-                  secureTextEntry={passwordIsHide}
+                  value={formik.values.login}
+                  validate={registerSchema.login}
+                  onChangeText={formik.handleChange("login")}
                   onFocus={() => {
-                    setInputPasswordActive(true);
+                    setInputLoginActive(true);
                     setIsShowKeyboard(true);
                   }}
                   onBlur={() => {
-                    setInputPasswordActive(false);
+                    formik.handleBlur("login");
+                    setInputLoginActive(false);
                   }}
-                  onChangeText={(value) =>
-                    setUser((prevstate) => ({
-                      ...prevstate,
-                      password: value,
-                    }))
-                  }
                   onSubmitEditing={() => {
                     keboardHide();
                   }}
                 ></TextInput>
+                <TextInput
+                  style={{
+                    ...globalStyle.input,
+                    marginTop: 16,
+                    backgroundColor: inputBackground(inputEmailActive),
+                    borderColor: inpuBorderColor(
+                      inputEmailActive,
+                      formik.values.email,
+                      formik.errors.email
+                    ),
+                  }}
+                  inputMode={"email"}
+                  autoCapitalize={"none"}
+                  placeholder={"Адреса електронної пошти"}
+                  autoComplete={"email"}
+                  placeholderTextColor={placeholderColor}
+                  cursorColor={acentColor}
+                  value={formik.values.email}
+                  validate={registerSchema.email}
+                  onChangeText={formik.handleChange("email")}
+                  onFocus={() => {
+                    setInputEmailActive(true);
+                    setIsShowKeyboard(true);
+                  }}
+                  onBlur={() => {
+                    formik.handleBlur("email"), setInputEmailActive(false);
+                  }}
+                  onSubmitEditing={() => {
+                    keboardHide();
+                  }}
+                ></TextInput>
+                <View>
+                  <TextInput
+                    style={{
+                      ...globalStyle.input,
+                      marginTop: 16,
+                      backgroundColor: inputBackground(inputPasswordActive),
+                      borderColor: inpuBorderColor(
+                        inputPasswordActive,
+                        formik.values.password,
+                        formik.errors.password
+                      ),
+                    }}
+                    inputMode={"text"}
+                    placeholder={"Пароль"}
+                    autoComplete={"new-password"}
+                    placeholderTextColor={placeholderColor}
+                    cursorColor={acentColor}
+                    secureTextEntry={passwordIsHide}
+                    value={formik.values.password}
+                    validate={registerSchema.password}
+                    onChangeText={formik.handleChange("password")}
+                    onFocus={() => {
+                      setInputPasswordActive(true);
+                      setIsShowKeyboard(true);
+                    }}
+                    onBlur={() => {
+                      formik.handleBlur("password"),
+                        setInputPasswordActive(false);
+                    }}
+                    onSubmitEditing={() => {
+                      keboardHide();
+                    }}
+                  ></TextInput>
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    style={styles.showPasswordBtn}
+                    onPress={() =>
+                      passwordIsHide
+                        ? setPasswordIsHide(false)
+                        : setPasswordIsHide(true)
+                    }
+                  >
+                    <Text style={{ fontSize: 16, color: linkColor }}>
+                      {passwordIsHide ? "Показати" : "Приховати"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <SubmitBtn
+                  type="submit"
+                  submit={formik.handleSubmit}
+                  bgColor={acentColor}
+                  titleColor={backgroundColor}
+                  title="Зареєструватися"
+                />
                 <TouchableOpacity
-                  activeOpacity={0.7}
-                  style={styles.showPasswordBtn}
-                  onPress={() =>
-                    passwordIsHide
-                      ? setPasswordIsHide(false)
-                      : setPasswordIsHide(true)
-                  }
+                  style={styles.goLogin}
+                  activeOpacity={0.6}
+                  onPress={() => navigation.navigate("Login")}
                 >
-                  <Text style={{ fontSize: 16, color: linkColor }}>
-                    {passwordIsHide ? "Показати" : "Приховати"}
-                  </Text>
+                  <Text style={styles.goLoginTitle}>Уже є аккаунт? Ввійти</Text>
                 </TouchableOpacity>
               </View>
-              <SubmitBtn
-                submit={submit}
-                bgColor={acentColor}
-                titleColor={backgroundColor}
-                title="Зареєструватися"
-              />
-              <TouchableOpacity
-                style={styles.goLogin}
-                activeOpacity={0.6}
-                onPress={() => navigation.navigate("Login")}
-              >
-                <Text style={styles.goLoginTitle}>Уже є аккаунт? Ввійти</Text>
-              </TouchableOpacity>
-            </View>
+            </Formik>
           </KeyboardAvoidingView>
         </ImageBackground>
         <StatusBar style="auto" />

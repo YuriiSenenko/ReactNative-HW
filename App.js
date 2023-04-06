@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useFonts } from "expo-font";
-import { NavigationContainer } from "@react-navigation/native";
-import useRoute from "./router";
+// import { NavigationContainer } from "@react-navigation/native";
+// import useRoute from "./router";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import AppRouting from "./components/AppRouting";

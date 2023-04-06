@@ -1,6 +1,13 @@
 import { StyleSheet } from "react-native";
 import { colors } from "./colors";
-const { textColor, placeholderColor, imputBackgroundColor } = colors;
+const {
+  backgroundColor,
+  borderColor,
+  acentColor,
+  textColor,
+  placeholderColor,
+  inputBackgroundColor,
+} = colors;
 
 const globalStyle = StyleSheet.create({
   title: {
@@ -17,7 +24,13 @@ const globalStyle = StyleSheet.create({
     height: 50,
     borderWidth: 1,
     color: textColor,
+    borderColor: borderColor,
+    backgroundColor: inputBackgroundColor,
   },
+  // inputActive: {
+  //   borderColor: acentColor,
+  //   backgroundColor: backgroundColor,
+  // },
 });
 
 const commentsGlobalStyle = StyleSheet.create({
@@ -27,7 +40,7 @@ const commentsGlobalStyle = StyleSheet.create({
     padding: 16,
     borderBottomRightRadius: 6,
     borderBottomLeftRadius: 6,
-    backgroundColor: imputBackgroundColor,
+    backgroundColor: inputBackgroundColor,
   },
   commentText: {
     fontFamily: "Roboto-400",
