@@ -25,7 +25,7 @@ import { Feather } from "@expo/vector-icons";
 // import { AntDesign } from "@expo/vector-icons";
 // import { SimpleLineIcons } from "@expo/vector-icons";
 
-const ProfileScreen = ({ navigation }) => {
+export const ProfileScreen = ({ navigation }) => {
   const [dimensions, setDimensions] = useState(Dimensions.get("window").width);
   const [isLoading, setIsLoading] = useState(true);
   const [posts, setPosts] = useState(null);
@@ -125,5 +125,3 @@ const ProfileScreen = ({ navigation }) => {
     </ScrollView>
   );
 };
-
-export default ProfileScreen;

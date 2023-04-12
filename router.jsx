@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { NavigationContainer } from "@react-navigation/native";
 import { useSelector } from "react-redux";
-// import { getUser } from "./redux/auth/selectors";
 
 import { StyleSheet, View } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -15,9 +16,11 @@ import { AntDesign } from "@expo/vector-icons";
 // import screens
 import RegistrationScreen from "./screens/auth/RegistrationScreen";
 import LoginScreen from "./screens/auth/LoginScreen.jsx";
-import Home from "./screens/mainScreen/Home";
-import CreatePostScreen from "./screens/mainScreen/CreatePostScreen";
-import ProfileScreen from "./screens/mainScreen/ProfileScreen";
+// import Home from "./screens/nestedScreens/Home";
+import { PostsScreen } from "./screens/mainScreen/PostsScreen";
+import { CreatePostScreen } from "./screens/mainScreen/CreatePostScreen";
+import { ProfileScreen } from "./screens/mainScreen/ProfileScreen";
+
 import { colors } from "./styles/colors";
 const { iconCameraColor, acentColor, textColor, goBackIconColor } = colors;
 
@@ -62,9 +65,10 @@ const useRoute = (isAuth) => {
               <Ionicons name="grid-outline" size={24} color={goBackIconColor} />
             </View>
           ),
+          // tabBarStyle: { display: "none" },
         }}
-        name="Дом"
-        component={Home}
+        name="Home"
+        component={PostsScreen}
       />
       <Tab.Screen
         options={({ navigation }) => ({

@@ -101,7 +101,6 @@ export const CreatePostScreen = ({ navigation }) => {
   // отримую фото і координати, записую в State
   const takePhoto = async () => {
     const result = await camera.takePictureAsync();
-
     const currentlocation = await Location.getCurrentPositionAsync();
     setPhoto(result.uri);
     setState((prevstate) => ({
@@ -244,5 +243,3 @@ export const CreatePostScreen = ({ navigation }) => {
     // </TouchableWithoutFeedback>
   );
 };
-
-export default CreatePostScreen;

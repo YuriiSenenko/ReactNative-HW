@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useFormik, Formik } from "formik";
 import { registerSchema } from "../../components/shemas/Shemas";
 
 import { useDispatch } from "react-redux";
-import { addUser } from "../../redux/auth/actions";
 
 import { styles } from "./RegistrationScreen.styles";
 import { StatusBar } from "expo-status-bar";
@@ -22,6 +21,10 @@ import {
   Dimensions,
   Alert,
 } from "react-native";
+
+import { authSignUpUser } from "../../redux/auth/authOperations";
+import { userAuth } from "../../redux/auth/authOperations";
+
 import { SubmitBtn } from "../../components/SubmitBtn";
 import { globalStyle } from "../../styles/globalStyle";
 import { colors } from "../../styles/colors";
@@ -39,43 +42,24 @@ const {
 import { AntDesign } from "@expo/vector-icons";
 
 const initialState = {
-  avatar: null,
-  login: null,
-  email: null,
-  password: null,
+  avatar: "",
+  login: "",
+  email: "",
+  password: "",
 };
 
 export default function RegistrationScreen({ navigation }) {
-  const [user, setUser] = useState(initialState);
-  const [image, setImage] = useState(null);
+  // const [state, setState] = useState(initialState);
+  const [avatar, setAvatar] = useState(null);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [dimensions, setDimensions] = useState(Dimensions.get("window").width);
   const [passwordIsHide, setPasswordIsHide] = useState(true);
+
   const [inputLoginActive, setInputLoginActive] = useState(false);
   const [inputEmailActive, setInputEmailActive] = useState(false);
   const [inputPasswordActive, setInputPasswordActive] = useState(false);
 
   const dispatch = useDispatch();
-
-  //! Formik
-  const formik = useFormik({
-    initialValues: {
-      login: "",
-      email: "",
-      password: "",
-    },
-    validationSchema: registerSchema,
-
-    onSubmit: (values, action) => {
-      setUser((prevstate) => ({
-        ...prevstate,
-        login: values.login,
-        email: values.email,
-        password: values.password,
-      }));
-      submit();
-    },
-  });
 
   //! Зміна кольору input
   const inpuBorderColor = (inputActive, hasValue, error) => {
@@ -108,17 +92,13 @@ export default function RegistrationScreen({ navigation }) {
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      setUser((prevstate) => ({
-        ...prevstate,
-        avatar: result.assets[0].uri,
-      }));
+      setAvatar(result.assets[0].uri);
     }
   };
 
   //! Видалення аватарки
   const deleteAvatar = () => {
-    setImage(null);
+    setAvatar(null);
   };
 
   //! Закриття клавіатури
@@ -127,21 +107,33 @@ export default function RegistrationScreen({ navigation }) {
     Keyboard.dismiss();
   };
 
-  //! Відправка і очистка форми
-  const submit = () => {
-    if (!user.avatar) {
-      Alert.alert("Помилка в формі реєстрації:", "Завантажте фотографію!");
-      return;
-    }
-
-    console.log(user);
-    dispatch(addUser(user));
-    setIsShowKeyboard(false);
-    Keyboard.dismiss();
-    setUser(initialState);
-    setImage(null);
-    setPasswordIsHide(true);
-  };
+  //! Formik
+  const formik = useFormik({
+    initialValues: {
+      login: "",
+      email: "",
+      password: "",
+    },
+    validationSchema: registerSchema,
+    onSubmit: (values) => {
+      if (!avatar) {
+        Alert.alert(
+          "Помилка в формі реєстрації:",
+          "Ну що поробиш, фотка теж обов'язкова!"
+        );
+        return;
+      }
+      const { login, email, password } = values;
+      const newUser = { avatar, login, email, password };
+      console.log(newUser);
+      dispatch(authSignUpUser(newUser));
+      setIsShowKeyboard(false);
+      Keyboard.dismiss();
+      setAvatar(null);
+      setPasswordIsHide(true);
+      formik.resetForm();
+    },
+  });
 
   return (
     <TouchableWithoutFeedback onPress={keboardHide}>
@@ -164,9 +156,10 @@ export default function RegistrationScreen({ navigation }) {
                     left: dimensions / 2 - 60,
                   }}
                 >
-                  <Image style={styles.avatarImage} source={{ uri: image }} />
-                  {!image ? (
+                  <Image style={styles.avatarImage} source={{ uri: avatar }} />
+                  {!avatar ? (
                     <TouchableOpacity
+                      name="avatar"
                       style={styles.addIcon}
                       activeOpacity={0.6}
                       onPress={getImage}
@@ -209,7 +202,6 @@ export default function RegistrationScreen({ navigation }) {
                   placeholder={"Логін"}
                   placeholderTextColor={placeholderColor}
                   cursorColor={acentColor}
-                  // value={formik.values.login}
                   value={
                     !inputLoginActive && formik.errors.login
                       ? formik.errors.login
@@ -246,7 +238,6 @@ export default function RegistrationScreen({ navigation }) {
                   autoComplete={"email"}
                   placeholderTextColor={placeholderColor}
                   cursorColor={acentColor}
-                  // value={formik.values.email}
                   value={
                     !inputEmailActive && formik.errors.email
                       ? formik.errors.email

@@ -3,7 +3,7 @@ import { useFormik, Formik } from "formik";
 import { loginSchema } from "../../components/shemas/Shemas";
 
 import { useDispatch } from "react-redux";
-import { addUser } from "../../redux/auth/actions";
+import { authSignInUser } from "../../redux/auth/authOperations";
 
 import { styles } from "./LoginScreen.styles";
 import { SubmitBtn } from "../../components/SubmitBtn";
@@ -37,36 +37,12 @@ const initialState = {
 };
 
 export default function LoginScreen({ navigation }) {
-  const [user, setUser] = useState(initialState);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [passwordIsHide, setPasswordIsHide] = useState(true);
   const [inputEmailActive, setInputEmailActive] = useState(false);
   const [inputPasswordActive, setInputPasswordActive] = useState(false);
 
   const dispatch = useDispatch();
-
-  //! Formik
-  const formik = useFormik({
-    initialValues: {
-      email: "",
-      password: "",
-    },
-    validationSchema: loginSchema,
-
-    onSubmit: (values, action) => {
-      setUser((prevstate) => ({
-        ...prevstate,
-        email: values.email,
-        password: values.password,
-      }));
-
-      dispatch(addUser(values));
-      console.log(values);
-
-      // submit();
-      // onSubmit({ values, action });
-    },
-  });
 
   //! Зміна кольору input
   const inpuBorderColor = (inputActive, hasValue, error) => {
@@ -95,14 +71,23 @@ export default function LoginScreen({ navigation }) {
     Keyboard.dismiss();
   };
 
-  //! Відправка і очистка форми
-  // const submit = () => {
-  //   dispatch(addUser(user));
-  //   setIsShowKeyboard(false);
-  //   Keyboard.dismiss();
-  //   setUser(initialState);
-  //   setPasswordIsHide(true);
-  // };
+  //! Formik
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validationSchema: loginSchema,
+
+    onSubmit: (values) => {
+      console.log(values);
+      dispatch(authSignInUser(values));
+      setIsShowKeyboard(false);
+      Keyboard.dismiss();
+      setPasswordIsHide(true);
+      formik.resetForm();
+    },
+  });
 
   return (
     <TouchableWithoutFeedback onPress={keboardHide}>
@@ -178,7 +163,6 @@ export default function LoginScreen({ navigation }) {
                         ? false
                         : passwordIsHide
                     }
-                    // value={formik.values.password}
                     value={
                       !inputPasswordActive && formik.errors.password
                         ? formik.errors.password
