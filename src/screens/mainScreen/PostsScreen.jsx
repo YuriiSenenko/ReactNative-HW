@@ -8,9 +8,11 @@ import { colors } from "../../styles/colors";
 const { textColor, placeholderColor, goBackIconColor } = colors;
 // import icons
 import { Feather } from "@expo/vector-icons";
+
 import { AntDesign } from "@expo/vector-icons";
 import { getAuth, signOut } from "firebase/auth";
 import { authSignOutUser } from "../../redux/auth/authOperations";
+
 const NestedScreen = createNativeStackNavigator();
 
 export const PostsScreen = () => {

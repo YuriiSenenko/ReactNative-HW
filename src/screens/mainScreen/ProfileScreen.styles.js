@@ -38,15 +38,23 @@ export const styles = StyleSheet.create({
     width: 120,
     borderRadius: 16,
   },
-  addIcon: {
+  deleteIcon: {
+    // borderWidth: 1,
+    // width: 25,
+    // height: 25,
     position: "absolute",
     top: 80,
     right: -12,
+    zIndex: 200,
   },
-  logoutIcon: {
+  logoutButton: {
+    // borderWidth: 1,
+    // width: 24,
+    // height: 24,
     position: "absolute",
     right: 16,
     top: 22,
+    zIndex: 200,
   },
   title: {
     marginTop: 92,

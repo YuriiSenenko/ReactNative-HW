@@ -42,7 +42,7 @@ const {
 import { AntDesign } from "@expo/vector-icons";
 
 // import Firebase
-import db from "../../firebase/config";
+import app from "../../firebase/config";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const initialState = {
@@ -162,7 +162,7 @@ export default function RegistrationScreen({ navigation }) {
     <TouchableWithoutFeedback onPress={keboardHide}>
       <View style={styles.container}>
         <ImageBackground
-          source={require("../../assets/images/sea.jpg")}
+          source={require("../../../assets/images/sea.jpg")}
           style={styles.backgroundImg}
         >
           <KeyboardAvoidingView behavior={Platform.OS === "ios" && "padding"}>

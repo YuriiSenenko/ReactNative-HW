@@ -1,7 +1,16 @@
 import { isLoading } from "expo-font";
 import { useSelector } from "react-redux";
 
-import { getUser } from "../../redux/auth/selectors";
+// import Firebase
+import app from "../../firebase/config";
+// import { getFirestore } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  onSnapshot,
+  getCountFromServer,
+} from "firebase/firestore";
+
 import React, { useState, useEffect } from "react";
 import { styles } from "./Home.styles";
 import {
@@ -17,59 +26,49 @@ import {
 } from "react-native";
 
 import Post from "../../components/Post";
-import { colors } from "../../src/styles/colors";
+import { colors } from "../../styles/colors";
 const { backgroundColor, acentColor } = colors;
-
-const initialState = {
-  photo: "https://loremflickr.com/640/480/city",
-  name: "Photo",
-  location: "Chercasy",
-  coords: {
-    accuracy: 14.286999702453613,
-    altitude: 124.9000015258789,
-    altitudeAccuracy: 1,
-    heading: 0,
-    latitude: 49.4323244,
-    longitude: 32.0763013,
-    speed: 0,
-  },
-  comments: 50,
-  likes: 524,
-};
 
 export default function PostsScreen({ navigation, route }) {
   const [isLoading, setIsLoading] = useState(true);
   const [posts, setPosts] = useState([]);
   const { avatar, login, email } = useSelector((state) => state.auth);
 
-  // console.log({ avatar, login, email });
-
-  // const fetchPosts = () => {
-  //   fetch("https://6404410580d9c5c7bac3f01d.mockapi.io/userPosts")
-  //     .then((response) => {
-  //       return response.json();
-  //     })
-  //     .then((posts) => {
-  //       setPosts(posts);
-  //     })
-  //     .catch((error) => {
-  //       Alert.alert("Помилка", "Помилка завантаження");
-  //     })
-  //     .finally(() => {
-  //       setIsLoading(false);
-  //     });
-  // };
+  const firestoreCloud = getFirestore(app);
 
   useEffect(() => {
-    // fetchPosts();
-    if (route.params) {
-      setPosts((prevstate) => [...prevstate, route.params.state]);
-    }
+    getAllPosts();
+  }, []);
 
-    if (posts) {
-      setIsLoading(false);
-    }
-  }, [route.params]);
+  //! Отримання всіх постів
+  const getAllPosts = async () => {
+    const postsRef = collection(firestoreCloud, "posts");
+
+    onSnapshot(postsRef, (collection) => {
+      const allPosts = collection.docs.map((doc) => {
+        commentsCount(doc.id);
+        return {
+          ...doc.data(),
+          id: doc.id,
+          countOfComments: 5,
+          countOfLikes: 10,
+        };
+      });
+      setPosts(allPosts);
+    });
+
+    setIsLoading(false);
+  };
+
+  //! Лічильний коментарів
+  const commentsCount = async (id) => {
+    const commentsRef = collection(firestoreCloud, "posts", id, "comments");
+    const snapshot = await getCountFromServer(commentsRef);
+    const commentCount = snapshot.data().count;
+
+    console.log(`Кількість коментарів: ${id}: ${commentCount}`);
+    return commentCount;
+  };
 
   if (isLoading) {
     return (
@@ -93,21 +92,25 @@ export default function PostsScreen({ navigation, route }) {
         <FlatList
           style={styles.postsList}
           refreshControl={
-            <RefreshControl refreshing={isLoading} />
-            // <RefreshControl refreshing={isLoading} onRefresh={fetchPosts} />
+            <RefreshControl refreshing={isLoading} onRefresh={getAllPosts} />
           }
           data={posts}
           renderItem={({ item }) => (
             <Post
-              goComment={() => navigation.navigate("Коментарі", { item })}
+              goComment={() =>
+                navigation.navigate("Коментарі", { photo: item })
+              }
               goMap={() => navigation.navigate("Карта", { item })}
               photo={item.photo}
-              name={item.name}
-              comments={35}
-              likes={540}
+              title={item.title}
+              // comments={item.countOfComments}
+              // likes={item.countOfLikes}
+              comments="10"
+              likes="10"
               location={item.location}
             />
           )}
+          keyExtractor={(item) => item.id}
         />
       </View>
     </View>

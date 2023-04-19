@@ -93,7 +93,7 @@ export default function LoginScreen({ navigation }) {
     <TouchableWithoutFeedback onPress={keboardHide}>
       <View style={styles.container}>
         <ImageBackground
-          source={require("../../assets/images/sea.jpg")}
+          source={require("../../../assets/images/sea.jpg")}
           style={styles.backgroundImg}
         >
           <KeyboardAvoidingView behavior={Platform.OS === "ios" && "padding"}>

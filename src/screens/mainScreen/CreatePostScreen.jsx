@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import db from "../../firebase/config";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useSelector } from "react-redux";
 
 import * as Location from "expo-location";
 import {
@@ -17,7 +16,12 @@ import {
   Alert,
 } from "react-native";
 
-// import { getStorage } from "firebase/storage";
+// import Firebase
+import app from "../../firebase/config";
+import { getFirestore } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { collection, addDoc } from "firebase/firestore";
+
 import { styles } from "./CreatePostScreen.styles";
 import { colors } from "../../styles/colors";
 const {
@@ -44,7 +48,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const initialState = {
   photo: null,
-  name: null,
+  title: null,
   location: null,
   coords: null,
 };
@@ -64,40 +68,19 @@ export const CreatePostScreen = ({ navigation }) => {
   const [location, setLocation] = useState(null);
 
   const storage = getStorage();
+  const firestoreCloud = getFirestore(app);
 
-  (async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      setErrorMsg("Permission to access location was denied");
-      return;
-    }
-  })();
+  const { userId, login } = useSelector((state) => state.auth);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      (async () => {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          setErrorMsg("Permission to access location was denied");
-          return;
-        }
-      })();
-      return () => {
-        // Do something when the screen is unfocused
-        // Useful for cleanup functions
-      };
-    }, [])
-  );
-
-  // useEffect(() => {
-  //   (async () => {
-  //     let { status } = await Location.requestForegroundPermissionsAsync();
-  //     if (status !== "granted") {
-  //       setErrorMsg("Permission to access location was denied");
-  //       return;
-  //     }
-  //   })();
-  // }, []);
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+    })();
+  }, []);
 
   const keboardHide = () => {
     setIsShowKeyboard(false);
@@ -113,8 +96,9 @@ export const CreatePostScreen = ({ navigation }) => {
   //! отримую фото і координати, записую в State
   const takePhoto = async () => {
     const result = await camera.takePictureAsync();
-    const currentlocation = await Location.getCurrentPositionAsync();
     setPhoto(result.uri);
+
+    const currentlocation = await Location.getCurrentPositionAsync();
     setState((prevstate) => ({
       ...prevstate,
 
@@ -124,7 +108,7 @@ export const CreatePostScreen = ({ navigation }) => {
     }));
   };
 
-  //! При кліку на кнопку відпраки, якщо немає фото, виволить Alert
+  //! При кліку на кнопку відпраки, якщо немає фото, виводить Alert
   const alert = () => {
     Alert.alert("Зробіть фото");
     return;
@@ -144,13 +128,28 @@ export const CreatePostScreen = ({ navigation }) => {
 
     //todo -- Отримання посилання на фото з Firebase
     const pathReference = await getDownloadURL(storageRef);
-    console.log(pathReference);
+    // console.log(pathReference);
+    return pathReference;
   };
 
-  //! Передаю стейт на сторінку публікації
+  //! Загрузка публікації на сервер
+  const uploadPostToServer = async () => {
+    const photo = await uploadPhotoToServer();
+    const docRef = await addDoc(collection(firestoreCloud, "posts"), {
+      photo,
+      title: state.title,
+      location: state.location,
+      coords: state.coords,
+      owner: userId,
+      login,
+    });
+  };
+
+  //! Виклик запису фото і поста, перехід на сторінку постів
   const submit = async () => {
     uploadPhotoToServer();
-    // navigation.navigate("Публікації", { state });
+    uploadPostToServer();
+    navigation.navigate("Home");
     clearForm();
   };
 
@@ -204,12 +203,12 @@ export const CreatePostScreen = ({ navigation }) => {
             placeholder={"Назва..."}
             placeholderTextColor={placeholderColor}
             cursorColor={acentColor}
-            value={state.name}
+            value={state.title}
             onFocus={() => {
               setIsShowKeyboard(true);
             }}
             onChangeText={(value) =>
-              setState((prevstate) => ({ ...prevstate, name: value }))
+              setState((prevstate) => ({ ...prevstate, title: value }))
             }
             onSubmitEditing={() => {
               touchableWithout();

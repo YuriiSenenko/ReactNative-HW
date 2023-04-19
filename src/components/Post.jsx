@@ -5,11 +5,20 @@ import { Feather } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 
-const Post = ({ photo, name, comments, likes, location, goComment, goMap }) => {
+const Post = ({
+  photo,
+  title,
+  comments,
+  likes,
+  location,
+  goComment,
+  goMap,
+}) => {
   return (
     <View style={styles.postContainer}>
       <Image style={styles.photo} source={{ uri: photo }} />
-      <Text style={styles.photoName}>{name}</Text>
+
+      <Text style={styles.photoName}>{title}</Text>
       <View style={styles.fotoDescription}>
         <View style={{ flexDirection: "row" }}>
           <TouchableOpacity
