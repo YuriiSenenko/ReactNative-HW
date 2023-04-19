@@ -149,7 +149,7 @@ export const CreatePostScreen = ({ navigation }) => {
   const submit = async () => {
     uploadPhotoToServer();
     uploadPostToServer();
-    navigation.navigate("Home");
+    navigation.navigate("Публікації");
     clearForm();
   };
 
