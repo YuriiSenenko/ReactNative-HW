@@ -20,6 +20,7 @@ const { acentColor, borderColor, placeholderColor } = colors;
 
 import Post from "../../components/Post";
 import { authSignOutUser } from "../../redux/auth/authOperations";
+import { getUser } from "../../redux/auth/authReducer";
 
 // import Firebase
 import app from "../../firebase/config";
@@ -41,7 +42,7 @@ export const ProfileScreen = ({ navigation }) => {
   const [dimensions, setDimensions] = useState(Dimensions.get("window").width);
   const [isLoading, setIsLoading] = useState(true);
   const [posts, setPosts] = useState([]);
-  const { avatar, login, userId, email } = useSelector((state) => state.auth);
+  const { avatar, login, userId, email } = useSelector(getUser);
 
   const dispatch = useDispatch();
   const firestoreCloud = getFirestore(app);

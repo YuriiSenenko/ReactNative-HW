@@ -4,9 +4,11 @@ import { NavigationContainer } from "@react-navigation/native";
 
 import useRoute from "../router";
 import { authStateChangeUser } from "../redux/auth/authOperations";
+import { getUser } from "../redux/auth/authReducer";
 
 const Main = () => {
-  const { stateChange } = useSelector((state) => state.auth);
+  const { stateChange } = useSelector(getUser);
+
   const dispatch = useDispatch();
 
   useEffect(() => {

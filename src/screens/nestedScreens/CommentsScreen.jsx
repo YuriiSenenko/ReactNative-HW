@@ -19,7 +19,7 @@ const {
   borderColor,
   placeholderColor,
 } = colors;
-
+import { getUser } from "../../redux/auth/authReducer";
 import { OwnComment, GuestComment } from "../../components/Comment";
 
 // import Firebase
@@ -41,7 +41,7 @@ export default CommentsScreen = ({ navigation, route }) => {
   const [comment, setComment] = useState();
   const [allComments, setAllComments] = useState([]);
   const { photo, id } = route.params.photo;
-  const { userId, avatar } = useSelector((state) => state.auth);
+  const { userId, avatar } = useSelector(getUser);
 
   const firestoreCloud = getFirestore(); // ініціалізація firestore
 
@@ -99,20 +99,7 @@ export default CommentsScreen = ({ navigation, route }) => {
         }
         keyExtractor={(item) => item.id}
       />
-      {/* <ScrollView>
-        <View style={styles.commentsList}>
-          <OwnComment
-            avatar={avatar}
-            comment="vjdvfbjdfvbhksdfhvbksdfhvbkdfhvb"
-            date="10 Червня 2023 | 09: 15"
-          />
-          <GuestComment
-            avatar={"https://loremflickr.com/640/480/people"}
-            comment="vjdvfbjdfvbhksdfhvbksdfhvbkdfhvb"
-            date="10 Червня 2023 | 09: 25"
-          />
-        </View>
-      </ScrollView> */}
+
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}

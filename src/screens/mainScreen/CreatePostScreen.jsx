@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useFocusEffect } from "@react-navigation/native";
 import { useSelector } from "react-redux";
-
+import { getUser } from "../../redux/auth/authReducer";
 import * as Location from "expo-location";
 import {
   View,
@@ -42,10 +41,6 @@ import { Fontisto } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 
-// import { Header } from "@rneui/themed";
-// // import { TouchableOpacity } from "react-native-gesture-handler";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-
 const initialState = {
   photo: null,
   title: null,
@@ -70,7 +65,7 @@ export const CreatePostScreen = ({ navigation }) => {
   const storage = getStorage();
   const firestoreCloud = getFirestore(app);
 
-  const { userId, login } = useSelector((state) => state.auth);
+  const { userId, login } = useSelector(getUser);
 
   useEffect(() => {
     (async () => {

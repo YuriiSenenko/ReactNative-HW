@@ -1,3 +1,4 @@
+// import { useSelector } from "react-redux";
 import { createSlice } from "@reduxjs/toolkit";
 
 const state = {
@@ -35,3 +36,6 @@ export const authSlice = createSlice({
     authSignOut: () => state,
   },
 });
+
+// Selectors
+export const getUser = (state) => state.auth.auth;

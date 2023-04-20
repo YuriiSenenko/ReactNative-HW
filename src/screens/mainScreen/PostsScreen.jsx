@@ -1,5 +1,6 @@
 import { isLoading } from "expo-font";
 import { useSelector } from "react-redux";
+import { getUser } from "../../redux/auth/authReducer";
 
 // import Firebase
 import app from "../../firebase/config";
@@ -32,7 +33,7 @@ const { backgroundColor, acentColor } = colors;
 export default function PostsScreen({ navigation, route }) {
   const [isLoading, setIsLoading] = useState(true);
   const [posts, setPosts] = useState([]);
-  const { avatar, login, email } = useSelector((state) => state.auth);
+  const { avatar, login, email } = useSelector(getUser);
 
   const firestoreCloud = getFirestore(app);
 
@@ -66,7 +67,7 @@ export default function PostsScreen({ navigation, route }) {
     const snapshot = await getCountFromServer(commentsRef);
     const commentCount = snapshot.data().count;
 
-    console.log(`Кількість коментарів: ${id}: ${commentCount}`);
+    // console.log(`Кількість коментарів: ${id}: ${commentCount}`);
     return commentCount;
   };
 

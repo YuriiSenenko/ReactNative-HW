@@ -1,13 +1,10 @@
 import * as React from "react";
-import { StyleSheet } from "react-native";
 import { useFonts } from "expo-font";
 import { Provider } from "react-redux";
 import { store, persistor } from "./src/redux/store";
 import { PersistGate } from "redux-persist/integration/react";
-import { View, ImageBackground } from "react-native";
 
 import Main from "./src/components/Main";
-// import Main from "./components/Main";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -23,11 +20,9 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      {/* <PersistGate loading={null} persistor={persistor}> */}
-
-      <Main />
-
-      {/* </PersistGate> */}
+      <PersistGate loading={null} persistor={persistor}>
+        <Main />
+      </PersistGate>
     </Provider>
   );
 }

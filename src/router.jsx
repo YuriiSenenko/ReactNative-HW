@@ -1,17 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import React from "react";
 
-// import { getAuth, onAuthStateChanged } from "firebase/auth";
-// import { NavigationContainer } from "@react-navigation/native";
-// import { useSelector } from "react-redux";
-
-import { StyleSheet, View } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 // import icons
-import { Feather } from "@expo/vector-icons";
-// import { Ionicons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 
 // import screens
@@ -22,23 +13,12 @@ import CommentsScreen from "./screens/nestedScreens/CommentsScreen";
 import MapScreen from "./screens/nestedScreens/MapScreen";
 
 import { colors } from "./styles/colors";
-const {
-  iconCameraColor,
-  acentColor,
-  textColor,
-  goBackIconColor,
-  placeholderColor,
-} = colors;
+const { textColor, goBackIconColor } = colors;
 
 const AuthStack = createNativeStackNavigator();
-// const Tab = createBottomTabNavigator();
 const NestedScreen = createNativeStackNavigator();
 
 const useRoute = (isAuth) => {
-  const dispatch = useDispatch();
-  const logOutUser = () => {
-    dispatch(authSignOutUser());
-  };
   if (!isAuth) {
     return (
       <AuthStack.Navigator initialRouteName="Login">
@@ -64,7 +44,6 @@ const useRoute = (isAuth) => {
           fontSize: 17,
           color: textColor,
         },
-        // tabBarShowLabel: false,
       }}
     >
       <NestedScreen.Screen
@@ -110,21 +89,4 @@ const useRoute = (isAuth) => {
   );
 };
 
-// const styles = StyleSheet.create({
-//   iconsContainer: {
-//     justifyContent: "center",
-//     alignItems: "center",
-//     width: 40,
-//     height: 40,
-//   },
-
-//   buttonCreate: {
-//     justifyContent: "center",
-//     alignItems: "center",
-//     width: 70,
-//     height: 40,
-//     backgroundColor: acentColor,
-//     borderRadius: 20,
-//   },
-// });
 export default useRoute;
