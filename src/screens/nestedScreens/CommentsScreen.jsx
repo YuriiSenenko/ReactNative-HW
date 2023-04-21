@@ -51,11 +51,30 @@ export default CommentsScreen = ({ navigation, route }) => {
 
   //! Створюємо і відправляємо на сервер новий коментар
   const createComment = async () => {
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    const currentDate = new Date();
+    const commentDate = `${currentDate.toLocaleDateString(
+      "uk-uk",
+      options
+    )} | ${currentDate.toLocaleTimeString("uk-uk")}`;
+    console.log(commentDate);
+
+    // const currentDate = new Date().toLocaleDateString("uk-uk", options);
+    // const currentTime = new Date().toLocaleTimeString("uk-uk");
     if (!comment) {
       Alert.alert("Напиши пару слів в коментар");
       return;
     }
-    const newComment = { postId: id, comment: comment, owner: userId };
+    const newComment = {
+      date: commentDate,
+      postId: id,
+      comment: comment,
+      owner: userId,
+    };
     await addDoc(
       collection(firestoreCloud, "posts", id, "comments"),
       newComment
@@ -87,13 +106,13 @@ export default CommentsScreen = ({ navigation, route }) => {
             <OwnComment
               avatar={avatar}
               comment={item.comment}
-              date="10 Червня 2023 | 09: 15"
+              date={item.date}
             />
           ) : (
             <GuestComment
               avatar={"https://loremflickr.com/640/480/people"}
               comment={item.comment}
-              date="10 Червня 2023 | 09: 25"
+              date={item.date}
             />
           )
         }

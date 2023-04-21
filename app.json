@@ -23,7 +23,10 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "jsEngine": "jsc",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "jsEngine": "jsc",

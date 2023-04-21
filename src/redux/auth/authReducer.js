@@ -2,6 +2,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const state = {
+  token: null,
   userId: null,
   avatar: null,
   login: null,
@@ -22,6 +23,7 @@ export const authSlice = createSlice({
     // Екшен де додаємо дані до User
     updateUserProfile: (state, { payload }) => ({
       ...state,
+      token: payload.token,
       userId: payload.userId,
       avatar: payload.avatar,
       login: payload.login,
@@ -38,4 +40,4 @@ export const authSlice = createSlice({
 });
 
 // Selectors
-export const getUser = (state) => state.auth.auth;
+export const getUser = (state) => state.auth;
