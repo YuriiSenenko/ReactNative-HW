@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { styles } from "./CommentsScreen.styles";
 import {
+  TouchableWithoutFeedback,
   View,
   Image,
   Text,
@@ -10,6 +11,9 @@ import {
   ScrollView,
   FlatList,
   Alert,
+  KeyboardAvoidingView,
+  Keyboard,
+  Platform,
 } from "react-native";
 import { colors } from "../../styles/colors";
 const {
@@ -38,6 +42,7 @@ import {
 import { AntDesign } from "@expo/vector-icons";
 
 export default CommentsScreen = ({ navigation, route }) => {
+  const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [comment, setComment] = useState();
   const [allComments, setAllComments] = useState([]);
   const { photo, id } = route.params.photo;
@@ -48,6 +53,12 @@ export default CommentsScreen = ({ navigation, route }) => {
   useEffect(() => {
     getAllComments();
   }, []);
+
+  //! Закриття клавіатури
+  const keboardHide = () => {
+    setIsShowKeyboard(false);
+    Keyboard.dismiss();
+  };
 
   //! Створюємо і відправляємо на сервер новий коментар
   const createComment = async () => {
@@ -61,10 +72,7 @@ export default CommentsScreen = ({ navigation, route }) => {
       "uk-uk",
       options
     )} | ${currentDate.toLocaleTimeString("uk-uk")}`;
-    console.log(commentDate);
 
-    // const currentDate = new Date().toLocaleDateString("uk-uk", options);
-    // const currentTime = new Date().toLocaleTimeString("uk-uk");
     if (!comment) {
       Alert.alert("Напиши пару слів в коментар");
       return;
@@ -94,10 +102,12 @@ export default CommentsScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <Image
-        style={{ ...styles.photo, marginLeft: 16 }}
-        source={{ uri: photo }}
-      />
+      <TouchableWithoutFeedback onPress={keboardHide}>
+        <Image
+          style={{ ...styles.photo, marginLeft: 16 }}
+          source={{ uri: photo }}
+        />
+      </TouchableWithoutFeedback>
       <FlatList
         style={styles.postsList}
         data={allComments}
@@ -118,26 +128,41 @@ export default CommentsScreen = ({ navigation, route }) => {
         }
         keyExtractor={(item) => item.id}
       />
-
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          multiline={true}
-          inputMode={"text"}
-          placeholder={"Коментувати..."}
-          placeholderTextColor={placeholderColor}
-          cursorColor={acentColor}
-          value={comment}
-          onChangeText={(value) => setComment(value)}
-        ></TextInput>
-        <TouchableOpacity
-          style={styles.sendBTN}
-          activeOpacity={0.6}
-          onPress={createComment}
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" && "padding"}>
+        <View
+          style={{
+            ...styles.inputContainer,
+            marginBottom: isShowKeyboard ? 100 : 16,
+          }}
         >
-          <AntDesign name="arrowup" size={24} color={backgroundColor} />
-        </TouchableOpacity>
-      </View>
+          <TextInput
+            style={styles.input}
+            multiline={true}
+            inputMode={"text"}
+            placeholder={"Коментувати..."}
+            placeholderTextColor={placeholderColor}
+            cursorColor={acentColor}
+            value={comment}
+            onChangeText={(value) => setComment(value)}
+            onFocus={() => {
+              setIsShowKeyboard(true);
+            }}
+            onBlur={() => {
+              setIsShowKeyboard(false);
+            }}
+          ></TextInput>
+          <TouchableOpacity
+            style={styles.sendBTN}
+            activeOpacity={0.6}
+            onPress={() => {
+              createComment();
+              keboardHide();
+            }}
+          >
+            <AntDesign name="arrowup" size={24} color={backgroundColor} />
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
     </View>
   );
 };

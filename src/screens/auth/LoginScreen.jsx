@@ -80,7 +80,6 @@ export default function LoginScreen({ navigation }) {
     validationSchema: loginSchema,
 
     onSubmit: (values) => {
-      // console.log(values);
       dispatch(authSignInUser(values));
       setIsShowKeyboard(false);
       Keyboard.dismiss();

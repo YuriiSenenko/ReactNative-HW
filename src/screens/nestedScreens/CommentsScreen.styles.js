@@ -21,13 +21,16 @@ export const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
 
+  postsList: {
+    marginBottom: 10,
+  },
+
   inputContainer: {
     height: 50,
     marginHorizontal: 16,
 
     paddingLeft: 16,
     paddingRight: 45,
-    marginBottom: 16,
     borderRadius: 100,
     borderWidth: 1,
     borderColor: borderColor,
