@@ -9,7 +9,10 @@ import {
   getFirestore,
   collection,
   onSnapshot,
-  getCountFromServer,
+  orderBy,
+  query,
+  doc,
+  updateDoc,
 } from "firebase/firestore";
 
 import React, { useState, useEffect } from "react";
@@ -24,6 +27,7 @@ import {
   Alert,
   TouchableOpacity,
   ScrollView,
+  SafeAreaView,
 } from "react-native";
 
 import Post from "../../components/Post";
@@ -33,7 +37,8 @@ const { backgroundColor, acentColor } = colors;
 export default function PostsScreen({ navigation, route }) {
   const [isLoading, setIsLoading] = useState(true);
   const [posts, setPosts] = useState([]);
-  const { avatar, login, email } = useSelector(getUser);
+
+  const { avatar, login, email, userId } = useSelector(getUser);
 
   const firestoreCloud = getFirestore(app);
 
@@ -43,16 +48,15 @@ export default function PostsScreen({ navigation, route }) {
 
   //! Отримання всіх постів
   const getAllPosts = async () => {
-    const postsRef = collection(firestoreCloud, "posts");
-
+    const postsRef = query(
+      collection(firestoreCloud, "posts"),
+      orderBy("date", "desc")
+    );
     onSnapshot(postsRef, (collection) => {
       const allPosts = collection.docs.map((doc) => {
-        commentsCount(doc.id);
         return {
           ...doc.data(),
           id: doc.id,
-          countOfComments: 5,
-          countOfLikes: 10,
         };
       });
       setPosts(allPosts);
@@ -61,14 +65,20 @@ export default function PostsScreen({ navigation, route }) {
     setIsLoading(false);
   };
 
-  //! Лічильний коментарів
-  const commentsCount = async (id) => {
-    const commentsRef = collection(firestoreCloud, "posts", id, "comments");
-    const snapshot = await getCountFromServer(commentsRef);
-    const commentCount = snapshot.data().count;
-
-    // console.log(`Кількість коментарів: ${id}: ${commentCount}`);
-    return commentCount;
+  // //! Лічильник лайків
+  const likesCounter = (postId, likesUsers) => {
+    let arr = likesUsers;
+    const index = arr.findIndex((element, index) => element.userId === userId);
+    if (index === -1) {
+      arr.push({ login, userId });
+    } else {
+      arr.splice(index, 1);
+    }
+    const postForUpdate = doc(firestoreCloud, "posts", postId);
+    updateDoc(postForUpdate, {
+      likesUsers: arr,
+      likesCounter: arr.length,
+    });
   };
 
   if (isLoading) {
@@ -81,14 +91,14 @@ export default function PostsScreen({ navigation, route }) {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.userCard}>
+    <SafeAreaView style={styles.container}>
+      {/* <View style={styles.userCard}>
         <Image style={styles.avatarImage} source={{ uri: avatar }} />
         <View style={styles.userData}>
           <Text style={styles.userName}>{login}</Text>
           <Text style={styles.userEmail}>{email}</Text>
         </View>
-      </View>
+      </View> */}
       <View style={styles.postsListContainer}>
         <FlatList
           style={styles.postsList}
@@ -96,24 +106,32 @@ export default function PostsScreen({ navigation, route }) {
             <RefreshControl refreshing={isLoading} onRefresh={getAllPosts} />
           }
           data={posts}
+          ListHeaderComponent={
+            <View style={styles.userCard}>
+              <Image style={styles.avatarImage} source={{ uri: avatar }} />
+              <View style={styles.userData}>
+                <Text style={styles.userName}>{login}</Text>
+                <Text style={styles.userEmail}>{email}</Text>
+              </View>
+            </View>
+          }
           renderItem={({ item }) => (
             <Post
               goComment={() =>
                 navigation.navigate("Коментарі", { photo: item })
               }
               goMap={() => navigation.navigate("Карта", { item })}
+              likeCounter={() => likesCounter(item.id, item.likesUsers)}
               photo={item.photo}
               title={item.title}
-              // comments={item.countOfComments}
-              // likes={item.countOfLikes}
-              comments="10"
-              likes="10"
+              comments={item.commentsCounter}
+              likes={item.likesCounter}
               location={item.location}
             />
           )}
           keyExtractor={(item) => item.id}
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

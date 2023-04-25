@@ -31,6 +31,9 @@ import {
   query,
   onSnapshot,
   where,
+  orderBy,
+  doc,
+  updateDoc,
 } from "firebase/firestore";
 
 // import icons
@@ -38,7 +41,7 @@ import { Feather } from "@expo/vector-icons";
 // import { AntDesign } from "@expo/vector-icons";
 // import { SimpleLineIcons } from "@expo/vector-icons";
 
-export const ProfileScreen = ({ navigation }) => {
+export const ProfileScreen = ({ navigation, route }) => {
   const [dimensions, setDimensions] = useState(Dimensions.get("window").width);
   const [isLoading, setIsLoading] = useState(true);
   const [posts, setPosts] = useState([]);
@@ -61,8 +64,11 @@ export const ProfileScreen = ({ navigation }) => {
     // Посилання на каталог "posts" в БД і умову фільтрації
     const postsRef = query(
       collection(firestoreCloud, "posts"),
+      orderBy("date", "desc"),
       where("owner", "==", userId)
     );
+
+    // const q = query(postsRef, orderBy("date", "desc"));
     // Отримання колекції і обробка даних
     onSnapshot(postsRef, (collection) => {
       const allPosts = collection.docs.map((doc) => {
@@ -76,6 +82,22 @@ export const ProfileScreen = ({ navigation }) => {
       setPosts(allPosts);
     });
     setIsLoading(false);
+  };
+
+  // //! Лічильник лайків
+  const likesCounter = (postId, likesUsers) => {
+    let arr = likesUsers;
+    const index = arr.findIndex((element, index) => element.userId === userId);
+    if (index === -1) {
+      arr.push({ login, userId });
+    } else {
+      arr.splice(index, 1);
+    }
+    const postForUpdate = doc(firestoreCloud, "posts", postId);
+    updateDoc(postForUpdate, {
+      likesUsers: arr,
+      likesCounter: arr.length,
+    });
   };
 
   if (isLoading) {
@@ -113,7 +135,7 @@ export const ProfileScreen = ({ navigation }) => {
               <TouchableOpacity
                 style={styles.deleteIcon}
                 activeOpacity={0.2}
-                onPress={() => console.log("hjgkjghjgj")}
+                onPress={() => console.log("Зм")}
               >
                 <Feather name="x-circle" size={25} color={borderColor} />
               </TouchableOpacity>
@@ -126,19 +148,20 @@ export const ProfileScreen = ({ navigation }) => {
               <FlatList
                 data={posts}
                 renderItem={({ item }) => (
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    onPress={() => navigation.navigate("Коментарі", { item })}
-                  >
-                    <Post
-                      photo={item.photo}
-                      name={item.comment}
-                      comments={item.countOfComments}
-                      likes={item.countOfLikes}
-                      location={item.location}
-                    />
-                  </TouchableOpacity>
+                  <Post
+                    goComment={() =>
+                      navigation.navigate("Коментарі", { photo: item })
+                    }
+                    goMap={() => navigation.navigate("Карта", { item })}
+                    likeCounter={() => likesCounter(item.id, item.likesUsers)}
+                    photo={item.photo}
+                    title={item.title}
+                    comments={item.commentsCounter}
+                    likes={item.likesCounter}
+                    location={item.location}
+                  />
                 )}
+                keyExtractor={(item) => item.id}
               />
             </View>
           </View>

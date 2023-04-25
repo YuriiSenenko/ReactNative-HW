@@ -79,12 +79,15 @@ export const authStateChangeUser = () => async (dispatch, getState) => {
   await onAuthStateChanged(auth, async (user) => {
     //* Дістаю юзера з local storage
     const savedUser = await SecureStore.getItemAsync("JWT");
+    if (!savedUser && !user) {
+      return;
+    }
     const parsedUser = JSON.parse(savedUser);
 
     if (user) {
       dispatch(
         authSlice.actions.updateUserProfile({
-          token: user.accessToken,
+          // token: user.accessToken,
           userId: user.uid,
           avatar: user.photoURL,
           login: user.displayName,
@@ -96,7 +99,7 @@ export const authStateChangeUser = () => async (dispatch, getState) => {
     } else {
       dispatch(
         authSlice.actions.updateUserProfile({
-          token: parsedUser.accessToken,
+          // token: parsedUser.accessToken,
           userId: parsedUser.uid,
           avatar: parsedUser.photoURL,
           login: parsedUser.displayName,
@@ -111,8 +114,8 @@ export const authStateChangeUser = () => async (dispatch, getState) => {
 
 //! logOut ---------------------------------------------------------------
 export const authSignOutUser = () => async (dispatch, getState) => {
+  deleteStorage("JWT"); //* Видаляю юзера з local storage
   await signOut(auth);
+
   dispatch(authSlice.actions.authSignOut());
-  //* Видаляю юзера з local storage
-  deleteStorage("JWT");
 };

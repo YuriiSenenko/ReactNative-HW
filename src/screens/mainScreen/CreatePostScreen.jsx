@@ -48,19 +48,11 @@ const initialState = {
   coords: null,
 };
 
-// Get a reference to the storage service, which is used to create references in your storage bucket
-// const storage = getStorage();
-
-// Create a storage reference from our storage service
-// const storageRef = ref(storage);
-
 export const CreatePostScreen = ({ navigation }) => {
   const [state, setState] = useState(initialState);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
-  const [cameraIsActive, setCameraIsActive] = useState(false);
   const [camera, setCamera] = useState(null);
   const [photo, setPhoto] = useState(null);
-  const [location, setLocation] = useState(null);
 
   const storage = getStorage();
   const firestoreCloud = getFirestore(app);
@@ -117,13 +109,10 @@ export const CreatePostScreen = ({ navigation }) => {
     const storageRef = ref(storage, `postImages/${uniquePostId}`); //* Створення ссилки на картинку в БД
 
     //todo -- Завантаження фото на Firebase
-    await uploadBytes(storageRef, file).then((snapshot) => {
-      // console.log(snapshot);
-    });
+    await uploadBytes(storageRef, file).then((snapshot) => {});
 
     //todo -- Отримання посилання на фото з Firebase
     const pathReference = await getDownloadURL(storageRef);
-    // console.log(pathReference);
     return pathReference;
   };
 
@@ -131,12 +120,16 @@ export const CreatePostScreen = ({ navigation }) => {
   const uploadPostToServer = async () => {
     const photo = await uploadPhotoToServer();
     const docRef = await addDoc(collection(firestoreCloud, "posts"), {
+      date: new Date(),
       photo,
       title: state.title,
       location: state.location,
       coords: state.coords,
       owner: userId,
       login,
+      commentsCounter: 0,
+      likesUsers: [],
+      likesCounter: 0,
     });
   };
 

@@ -36,6 +36,12 @@ import {
   getDocs,
   setDoc,
   doc,
+  getAuth,
+  orderBy,
+  limit,
+  query,
+  ref,
+  updateDoc,
 } from "firebase/firestore";
 
 // import icons
@@ -45,7 +51,7 @@ export default CommentsScreen = ({ navigation, route }) => {
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [comment, setComment] = useState();
   const [allComments, setAllComments] = useState([]);
-  const { photo, id } = route.params.photo;
+  const { photo, id, commentsCounter } = route.params.photo;
   const { userId, avatar } = useSelector(getUser);
 
   const firestoreCloud = getFirestore(); // ініціалізація firestore
@@ -53,6 +59,12 @@ export default CommentsScreen = ({ navigation, route }) => {
   useEffect(() => {
     getAllComments();
   }, []);
+
+  //! Лічильник коментарів
+  const updateCommentsCounter = () => {
+    const postForUpdate = doc(firestoreCloud, "posts", id);
+    updateDoc(postForUpdate, { commentsCounter: commentsCounter + 1 });
+  };
 
   //! Закриття клавіатури
   const keboardHide = () => {
@@ -82,17 +94,20 @@ export default CommentsScreen = ({ navigation, route }) => {
       postId: id,
       comment: comment,
       owner: userId,
+      ownerPhoto: avatar,
     };
-    await addDoc(
-      collection(firestoreCloud, "posts", id, "comments"),
-      newComment
-    );
+    addDoc(collection(firestoreCloud, "posts", id, "comments"), newComment);
     setComment(null);
+    updateCommentsCounter();
   };
 
   //! Отримуємо всі коментарі
   const getAllComments = async () => {
-    const connentsRef = collection(firestoreCloud, "posts", id, "comments");
+    const connentsRef = query(
+      collection(firestoreCloud, `posts/${id}/comments`),
+      orderBy("date", "desc")
+    );
+
     onSnapshot(connentsRef, (collection) => {
       setAllComments(
         collection.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
@@ -120,7 +135,7 @@ export default CommentsScreen = ({ navigation, route }) => {
             />
           ) : (
             <GuestComment
-              avatar={"https://loremflickr.com/640/480/people"}
+              avatar={item.ownerPhoto}
               comment={item.comment}
               date={item.date}
             />

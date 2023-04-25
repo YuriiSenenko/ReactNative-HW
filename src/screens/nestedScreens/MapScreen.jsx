@@ -6,7 +6,6 @@ import { View } from "react-native";
 export default MapScreen = ({ route }) => {
   const { title } = route.params.item;
   const { latitude, longitude } = route.params.item.coords;
-  console.log(route.params.item);
   return (
     <View style={styles.container}>
       <MapView

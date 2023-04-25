@@ -23,7 +23,7 @@ export const authSlice = createSlice({
     // Екшен де додаємо дані до User
     updateUserProfile: (state, { payload }) => ({
       ...state,
-      token: payload.token,
+      // token: payload.token,
       userId: payload.userId,
       avatar: payload.avatar,
       login: payload.login,

@@ -57,9 +57,7 @@ const useRoute = (isAuth) => {
         options={({ navigation }) => ({
           headerLeft: () => (
             <AntDesign
-              onPress={() => {
-                navigation.navigate("Публікації");
-              }}
+              onPress={navigation.goBack}
               name="arrowleft"
               size={24}
               color={goBackIconColor}
@@ -73,9 +71,7 @@ const useRoute = (isAuth) => {
         options={({ navigation }) => ({
           headerLeft: () => (
             <AntDesign
-              onPress={() => {
-                navigation.navigate("Публікації");
-              }}
+              onPress={navigation.goBack}
               name="arrowleft"
               size={24}
               color={goBackIconColor}

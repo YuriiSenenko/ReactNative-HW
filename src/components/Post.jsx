@@ -6,6 +6,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 
 const Post = ({
+  // id,
   photo,
   title,
   comments,
@@ -13,6 +14,7 @@ const Post = ({
   location,
   goComment,
   goMap,
+  likeCounter,
 }) => {
   return (
     <View style={styles.postContainer}>
@@ -29,10 +31,10 @@ const Post = ({
             <Feather name="message-circle" size={24} color="#FF6C00" />
             <Text style={{ marginLeft: 6 }}>{comments}</Text>
           </TouchableOpacity>
-          <View style={styles.likes}>
+          <TouchableOpacity style={styles.likes} onPress={likeCounter}>
             <AntDesign name="like2" size={24} color="#FF6C00" />
             <Text style={{ marginLeft: 6 }}>{likes}</Text>
-          </View>
+          </TouchableOpacity>
         </View>
         <TouchableOpacity style={styles.location} onPress={goMap}>
           <SimpleLineIcons name="location-pin" size={24} color="#BDBDBD" />
